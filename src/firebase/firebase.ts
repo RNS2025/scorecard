@@ -1,17 +1,19 @@
 import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDDDOeYz56M_BmBpLS105dSeXe6x2KbdyA",
-    authDomain: "scorecard-99b96.firebaseapp.com",
-    projectId: "scorecard-99b96",
-    storageBucket: "scorecard-99b96.firebasestorage.app",
-    messagingSenderId: "887902979194",
-    appId: "1:887902979194:web:76b32356e537d13efa27c3",
-    measurementId: "G-9ZXTW4Z8P0"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-export { app };
+export { app, auth };

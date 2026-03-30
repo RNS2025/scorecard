@@ -9,9 +9,10 @@ interface ScoreTabProps {
     onScoreChange: (playerIndex: number, value: number | null) => void;
     getPlayerDiffForHole: (score: number | null, par: number) => string | null;
     getDiffColor: (diff: string | null) => string;
+    goToStandingsTab: () => void;
 }
 
-const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, getPlayerDiffForHole, getDiffColor }: ScoreTabProps) => {
+const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, getPlayerDiffForHole, getDiffColor, goToStandingsTab }: ScoreTabProps) => {
     const hole = course.holes[currentHole];
 
     return (
@@ -91,10 +92,16 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                     ← Forrige
                 </button>
                 <button
-                    onClick={() => setCurrentHole(Math.min(course.holes.length - 1, currentHole + 1))}
-                    className={`${currentHole === course.holes.length - 1 ? "hidden" : ""} px-5 py-2 rounded-lg text-sm font-medium bg-green-700 text-white disabled:opacity-30 transition`}
+                    onClick={() => {
+                        if (currentHole < course.holes.length - 1) {
+                            setCurrentHole(Math.min(course.holes.length - 1, currentHole + 1))
+                        } else {
+                            goToStandingsTab();
+                        }
+                    }}
+                    className={`px-5 py-2 rounded-lg text-sm font-medium bg-green-700 text-white disabled:opacity-30 transition`}
                 >
-                    Næste →
+                    {currentHole === course.holes.length - 1 ? "Gå til stilling →" : "Næste →"}
                 </button>
             </div>
         </div>

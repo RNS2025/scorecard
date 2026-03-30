@@ -123,6 +123,7 @@ const ScorecardPage = () => {
                     onScoreChange={handleScoreChange}
                     getPlayerDiffForHole={getPlayerDiffForHole}
                     getDiffColor={getDiffColor}
+                    goToStandingsTab={() => handleTabChange("oversigt")}
                 />
             )}
 

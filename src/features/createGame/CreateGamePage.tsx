@@ -9,6 +9,7 @@ import Modal from "react-responsive-modal";
 import type { Game } from "../../utils/interfaces/Game.ts";
 import {da} from "date-fns/locale";
 import {format as formatDate} from "date-fns";
+import {ArrowLeftIcon} from "@heroicons/react/24/solid";
 
 const CreateGamePage = () => {
     const { courseId } = useParams();
@@ -61,7 +62,7 @@ const CreateGamePage = () => {
 
         createGame(game, {
             onSuccess: (savedGame) => {
-                navigate(`game/${savedGame.id}`);
+                navigate(`/${courseId}/game/${savedGame.id}`);
             },
         });
     }
@@ -72,12 +73,16 @@ const CreateGamePage = () => {
     if (isError || !course) return <p className="text-center mt-20 text-red-500">Der er sket en fejl. Prøv at genindlæs siden</p>;
 
     return (
-        <div className="max-w-md mx-auto px-6 pb-10">
+        <div className="mx-auto px-6 pb-10">
             {/* Header */}
-            <div className="flex flex-col items-center pt-6 pb-4">
-                <div className="w-full border-b flex justify-center">
+            <div className="grid grid-cols-3 items-center pt-6 pb-4">
+                <button onClick={() => navigate(`/`)} className="p-1 hover:bg-white/10 rounded-lg transition">
+                    <ArrowLeftIcon className="w-5 h-5" />
+                </button>
+                <div className="w-full flex justify-center">
                 <img src={scorecard_logo} alt="Scorecard Logo" className="w-20" />
                 </div>
+                <span></span>
             </div>
 
             {/* Bane-info kort */}
@@ -128,6 +133,14 @@ const CreateGamePage = () => {
                     {course.website && <span>🌐 {course.website}</span>}
                 </div>
             </div>
+
+            {/* Rangliste-knap */}
+            <button
+                onClick={() => navigate(`/${courseId}/leaderboard`)}
+                className="w-full mt-4 border-2 border-green-700 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
+            >
+                🏆 Se Rangliste
+            </button>
 
             {/* Formular */}
             <div className="mt-8 flex flex-col gap-5">

@@ -2,6 +2,9 @@ import type { Game } from "../../utils/interfaces/Game.ts";
 import type { Course } from "../../utils/interfaces/Course.ts";
 import type { Player } from "../../utils/interfaces/Game.ts";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { usePublishScores } from "../../hooks/useLeaderboard.ts";
+import type { LeaderboardEntry } from "../../utils/interfaces/Leaderboard.ts";
 
 interface PublishForm {
     name: string;
@@ -19,6 +22,8 @@ interface OverviewTabProps {
 }
 
 const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPlayerDiffForHole, getDiffColor }: OverviewTabProps) => {
+    const navigate = useNavigate();
+    const { mutate: publishScores, isPending: isPublishing } = usePublishScores();
     const [publishPlayers, setPublishPlayers] = useState<boolean[]>(game.players.map(() => false));
     const [step, setStep] = useState<"standings" | "publish">("standings");
     const [publishForms, setPublishForms] = useState<PublishForm[]>([]);
@@ -57,13 +62,40 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
     const allFormsValid = publishForms.every((f) => f.name.trim() && f.email.trim());
 
     const handlePublish = () => {
+        const confirmPublish = confirm(`Er du sikker på, at du vil publicere disse resultater?`);
+        if (!confirmPublish) return;
+
         if (!allFormsValid) return;
-        const formsToPublish = publishForms.map((f) => ({
-            ...f,
-            marketingConsent,
-        }));
-        // TODO: send formsToPublish til backend
-        console.log("Publicerer:", formsToPublish);
+
+        const selectedOriginalIndices = game.players
+            .map((_, i) => i)
+            .filter((i) => publishPlayers[i]);
+
+        const entries: Omit<LeaderboardEntry, "id" | "createdAt">[] = publishForms.map((f, i) => {
+            const player = game.players[selectedOriginalIndices[i]];
+            const totalShots = player.scores.reduce((sum: number, s) => sum + (s ?? 0), 0);
+            const totalPar = course.holes.reduce((sum, h, hi) => player.scores[hi] !== null ? sum + h.par : sum, 0);
+            return {
+                playerName: f.name,
+                email: f.email,
+                marketingConsent,
+                scores: player.scores,
+                totalShots,
+                totalDiff: totalShots - totalPar,
+                courseId: course.id!,
+                courseName: course.name,
+                gameId: game.id!,
+                format: game.format,
+            };
+        });
+
+        publishScores(entries, {
+            onSuccess: () => navigate(`/${course.id}/leaderboard`),
+            onError: (e) => {
+                alert("Noget gik galt – prøv igen.")
+                console.log("Publish error:", e);
+            },
+        });
     };
 
     // ==================== PUBLISH STEP ====================
@@ -129,10 +161,13 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
 
                 <button
                     onClick={handlePublish}
-                    disabled={!allFormsValid}
+                    disabled={!allFormsValid || isPublishing}
                     className="w-full mt-4 bg-linear-to-r from-green-500 to-green-800 text-white font-bold rounded-lg py-3 px-4 transition disabled:opacity-30"
                 >
-                    Publicér {publishForms.length} {publishForms.length === 1 ? "resultat" : "resultater"}
+                    {isPublishing
+                        ? "Publicerer..."
+                        : `Publicér ${publishForms.length} ${publishForms.length === 1 ? "resultat" : "resultater"}`
+                    }
                 </button>
             </div>
         );
@@ -187,7 +222,7 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
                         Tilfreds med runden? Publicér din score og se hvor du rangerer for denne bane!
                     </p>
                     <p className="text-xs text-green-600 mb-4">
-                        Fravælg spillere med checkboxen ved siden af scoren
+                        Marker spillere med checkboxen ved siden af scoren
                     </p>
                     <button
                         onClick={handleGoToPublish}
