@@ -154,7 +154,7 @@ const LeaderboardPage = () => {
                         <div className="flex flex-col gap-2">
                             {entries.map((entry, i) => (
                                 <div
-                                    key={`${entry.id}-${i}`}
+                                     key={`${entry.id}-${i}`}
                                     className={`flex items-center gap-3 bg-white rounded-xl p-4 transition`}
                                 >
                                     {/* Position */}
