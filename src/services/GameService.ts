@@ -3,13 +3,13 @@ import type {Game} from "../utils/interfaces/Game.ts"
 
 class GameService {
     static async createGame(game: Game): Promise<Game> {
-        await api.post('/games', game)
-        return game
+        const response = await api.post('/games', game)
+        return response.data as Game
     }
 
     static async updateGame(game: Game): Promise<Game> {
-        await api.put('/games/' + game.id, game)
-        return game
+        const response = await api.put('/games/' + game.id, game)
+        return response.data as Game
     }
 
     static async getGameById(id: string): Promise<Game> {

@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import { useGame, useUpdateGame } from "../../hooks/useGame.ts";
 import { useCourse } from "../../hooks/useCourses.ts";
 import { useState } from "react";
@@ -6,12 +6,16 @@ import type { Player } from "../../utils/interfaces/Game.ts";
 import type { Game } from "../../utils/interfaces/Game.ts";
 import ScoreTab from "./ScoreTab.tsx";
 import StandingsTab from "./StandingsTab.tsx";
+import { useCourseImage } from "../../hooks/useCourseImage.ts";
 
 const ScorecardPage = () => {
     const { courseId, gameId } = useParams();
     const { data: game, isLoading: gameLoading } = useGame(String(gameId));
     const { data: course, isLoading: courseLoading } = useCourse(String(courseId));
     const { mutate: updateGame } = useUpdateGame();
+    const navigate = useNavigate();
+    const { data: logoUrl } = useCourseImage(String(courseId), "logo");
+
 
     const [activeTab, setActiveTab] = useState<"score" | "oversigt">("score");
     const [currentHole, setCurrentHole] = useState<number>(0);
@@ -87,13 +91,21 @@ const ScorecardPage = () => {
     return (
         <div>
             {/* Header */}
-            <div className="bg-linear-to-r from-green-600 to-green-800 text-white px-5 py-4">
-                <h1 className="text-lg font-bold">{game.name}</h1>
-                <p className="text-green-200 text-sm">{course.name} · {course.numberOfHoles} huller · Par {course.par}</p>
+            <div className="bg-linear-to-r from-green-600 to-green-800 text-white px-5 py-4 flex justify-between items-center">
+                <div className="flex flex-col gap-1">
+                    <h1 className="text-lg font-bold">{game.name}</h1>
+                </div>
+
+                <span onClick={() => {
+                    const newRound = confirm("Er du sikker på at du vil afslutte runden? Denne runde bliver ikke gemt.");
+                    if (newRound) {
+                        navigate(`/${courseId}/creategame`)
+                    }
+                }}>Afslut runde</span>
             </div>
 
             {/* Tab-bar */}
-            <div className="grid grid-cols-2 border-b">
+            <div className="grid grid-cols-2">
                 <button
                     onClick={() => handleTabChange("score")}
                     className={`py-3 text-sm font-semibold transition
@@ -137,8 +149,16 @@ const ScorecardPage = () => {
                     getDiffColor={getDiffColor}
                 />
             )}
+
+            {/* Banelogo */}
+            {logoUrl && (
+                <div className="flex justify-center py-8">
+                    <img src={logoUrl} alt="Banens logo" className="h-12 object-contain" />
+                </div>
+            )}
         </div>
-    );
+
+);
 };
 
 export default ScorecardPage;

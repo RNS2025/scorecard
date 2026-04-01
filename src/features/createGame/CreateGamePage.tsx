@@ -1,25 +1,39 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCourse } from "../../hooks/useCourses.ts";
 import { useCreateGame } from "../../hooks/useGame.ts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import 'react-responsive-modal/styles.css';
 import scorecard_logo from "../../assets/scorecard logo.png";
 import {InformationCircleIcon} from "@heroicons/react/24/outline";
-import Modal from "react-responsive-modal";
+import FormatModal from "./FormatModal.tsx";
 import type { Game } from "../../utils/interfaces/Game.ts";
 import {da} from "date-fns/locale";
 import {format as formatDate} from "date-fns";
 import {ArrowLeftIcon} from "@heroicons/react/24/solid";
+import RulesModal from "./RulesModal.tsx";
+import { useCourseImage } from "../../hooks/useCourseImage.ts";
 
 const CreateGamePage = () => {
     const { courseId } = useParams();
     const navigate = useNavigate();
     const { data: course, isLoading, isError } = useCourse(String(courseId));
     const { mutate: createGame } = useCreateGame();
+    const { data: logoUrl } = useCourseImage(String(courseId), "logo");
+    const [logoShape, setLogoShape] = useState<"landscape" | "square" | null>(null);
 
-    const [format, setFormat] = useState<string>("slagspil");
+    useEffect(() => {
+        if (!logoUrl) return;
+        const img = new Image();
+        img.onload = () => {
+            setLogoShape(img.naturalWidth / img.naturalHeight > 1.4 ? "landscape" : "square");
+        };
+        img.src = logoUrl;
+    }, [logoUrl]);
+
+    const [format, setFormat] = useState<string>("slagspil")
     const [gameName, setGameName] = useState<string>("");
-    const [modalOpen, setModalOpen] = useState(false);
+    const [formatModalOpen, setFormatModalOpen] = useState(false);
+    const [rulesModalOpen, setRulesModalOpen] = useState(false);
     const [playerCount, setPlayerCount] = useState<number>(0);
     const [playerNames, setPlayerNames] = useState<string[]>([]);
 
@@ -86,7 +100,24 @@ const CreateGamePage = () => {
             </div>
 
             {/* Bane-info kort */}
-            <div className="bg-linear-to-br from-green-600 to-green-800 text-white rounded-2xl p-5 shadow-lg">
+            <div className={`relative bg-linear-to-br from-green-600 to-green-800 text-white rounded-2xl shadow-lg overflow-hidden ${logoUrl && logoShape === "square" ? "mt-8" : ""}`}>
+
+                {/* Banner-logo (aflangt) */}
+                {logoUrl && logoShape === "landscape" && (
+                    <div className="px-5 pt-4 pb-3 flex justify-center">
+                        <img src={logoUrl} alt={`${course.name} logo`} className="h-16 object-contain" />
+                    </div>
+                )}
+
+                <div className="relative p-5">
+
+                    {/* Badge-logo (kvadratisk/højt) */}
+                    {logoUrl && logoShape === "square" && (
+                        <div className="absolute -top-11 right-4 w-16 h-16 rounded-xl bg-white shadow-lg p-1.5 flex items-center justify-center">
+                            <img src={logoUrl} alt={`${course.name} logo`} className="w-full h-full object-contain rounded-lg" />
+                        </div>
+                    )}
+
                 <div className="flex items-center justify-between mb-3">
                     <h1 className="text-2xl font-bold">{course.name}</h1>
                 </div>
@@ -133,14 +164,26 @@ const CreateGamePage = () => {
                     {course.website && <span>🌐 {course.website}</span>}
                 </div>
             </div>
+            </div>
 
-            {/* Rangliste-knap */}
+            <div className="mt-4 flex flex-col gap-5">
             <button
                 onClick={() => navigate(`/${courseId}/leaderboard`)}
-                className="w-full mt-4 border-2 border-green-700 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
+                className="w-full border-2 border-green-700 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
             >
                 🏆 Se Rangliste
             </button>
+
+            <button
+                onClick={() => setRulesModalOpen(true)}
+                className="w-full border-2 border-green-700 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
+            >
+                📋 Læs regler
+            </button>
+
+            <RulesModal open={rulesModalOpen} onClose={() => setRulesModalOpen(false)} rules={course.rules ?? []} />
+
+            </div>
 
             {/* Formular */}
             <div className="mt-8 flex flex-col gap-5">
@@ -150,16 +193,10 @@ const CreateGamePage = () => {
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                         <label className="text-sm font-medium">Format</label>
-                        <InformationCircleIcon onClick={() => setModalOpen(true)} className="size-6 text-blue-400" />
+                        <InformationCircleIcon onClick={() => setFormatModalOpen(true)} className="size-6 text-blue-400" />
                     </div>
 
-                    <Modal open={modalOpen} onClose={() => setModalOpen(false)} center>
-                        <div className="flex flex-col gap-2 text-xs text-black">
-                            <h1 className="font-bold text-2xl">Hvad er slagspil?</h1>
-
-                            <p className="text-xl">Slagspil handler om at bruge færrest mulige slag over hele runden (typisk 18 huller).</p>
-                        </div>
-                    </Modal>
+                    <FormatModal open={formatModalOpen} onClose={() => setFormatModalOpen(false)} />
 
                     <div className="grid grid-cols-1 gap-2">
                         <button
@@ -225,6 +262,7 @@ const CreateGamePage = () => {
                     </div>
                 )}
 
+                <div className="flex flex-col gap-2">
 
                 {playerCount > 0 && playerNames.every((name) => name.trim()) && (
                 <button
@@ -235,6 +273,7 @@ const CreateGamePage = () => {
                     Start spil
                 </button>
                 )}
+            </div>
             </div>
 
         </div>

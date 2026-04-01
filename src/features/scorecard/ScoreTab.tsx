@@ -1,5 +1,11 @@
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import type { Game } from "../../utils/interfaces/Game.ts";
 import type { Course } from "../../utils/interfaces/Course.ts";
+import ScoreModal from "./ScoreModal.tsx";
+import { getScoreOptions } from "./scoreUtils.ts";
+import RulesModal from "../createGame/RulesModal.tsx";
+import HoleDescriptionModal from "./HoleDescriptionModal.tsx";
 
 interface ScoreTabProps {
     game: Game;
@@ -13,10 +19,30 @@ interface ScoreTabProps {
 }
 
 const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, getPlayerDiffForHole, getDiffColor, goToStandingsTab }: ScoreTabProps) => {
+    const { courseId } = useParams();
     const hole = course.holes[currentHole];
+    const [activePlayerIndex, setActivePlayerIndex] = useState<number | null>(null);
+    const scoreOptions = getScoreOptions(course.sport ?? "", hole.par);
+    const [rulesModalOpen, setRulesModalOpen] = useState(false);
+    const [holeDescModalOpen, setHoleDescModalOpen] = useState(false);
+
 
     return (
         <div className="px-5 pt-5">
+            {/* Score Modal */}
+            {activePlayerIndex !== null && (
+                <ScoreModal
+                    open={true}
+                    onClose={() => setActivePlayerIndex(null)}
+                    playerName={game.players[activePlayerIndex].name}
+                    holeNumber={hole.number}
+                    holePar={hole.par}
+                    sport={course.sport ?? ""}
+                    options={scoreOptions}
+                    currentScore={game.players[activePlayerIndex].scores[currentHole]}
+                    onSelectScore={(value) => onScoreChange(activePlayerIndex, value)}
+                />
+            )}
             {/* Hul-vælger */}
             <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
                 {course.holes.map((h, i) => {
@@ -54,29 +80,22 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                 {game.players.map((player, playerIndex) => {
                     const score = player.scores[currentHole];
                     return (
-                        <div key={playerIndex} className="flex items-center justify-between bg-white border rounded-xl p-4">
+                        <div key={playerIndex} className="flex items-center justify-between shadow-lg rounded-xl p-4">
                             <div>
                                 <p className="font-semibold">{player.name}</p>
                                 <p className={`text-xs ${getDiffColor(getPlayerDiffForHole(score, hole.par))}`}>
+                                    {getPlayerDiffForHole(score, hole.par)}
                                 </p>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <button
-                                    onClick={() => onScoreChange(playerIndex, Math.max(1, (score ?? 2) - 1))}
-                                    className="w-10 h-10 rounded-full bg-gray-100 text-lg font-bold text-gray-600 hover:bg-gray-200 transition"
-                                >
-                                    −
-                                </button>
-                                <span className="w-8 text-center text-xl font-bold">
-                                    {score ?? "—"}
-                                </span>
-                                <button
-                                    onClick={() => onScoreChange(playerIndex, (score ?? 0) + 1)}
-                                    className="w-10 h-10 rounded-full bg-gray-100 text-lg font-bold text-gray-600 hover:bg-gray-200 transition"
-                                >
-                                    +
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => setActivePlayerIndex(playerIndex)}
+                                className={`w-14 h-14 rounded-xl text-xl font-bold transition
+                                    ${score !== null
+                                        ? "bg-green-700 text-white"
+                                        : "bg-gray-100 text-gray-400 border-2 border-dashed border-gray-300"}`}
+                            >
+                                {score ?? "—"}
+                            </button>
                         </div>
                     );
                 })}
@@ -103,6 +122,29 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                 >
                     {currentHole === course.holes.length - 1 ? "Gå til stilling →" : "Næste →"}
                 </button>
+            </div>
+
+            <div className="py-8 grid grid-cols-2 gap-2 text-sm">
+                    <button
+                        onClick={() => setHoleDescModalOpen(true)}
+                        className="w-full shadow-md text-green-700 font-bold rounded-lg py-3 px-1 transition hover:bg-green-50"
+                    >
+                        ⛳ Banebeskrivelse
+                    </button>
+                    <HoleDescriptionModal
+                        open={holeDescModalOpen}
+                        onClose={() => setHoleDescModalOpen(false)}
+                        courseId={courseId ?? ""}
+                        holeNumber={hole.number}
+                    />
+
+                <button
+                    onClick={() => setRulesModalOpen(true)}
+                    className="w-full shadow-md text-green-700 font-bold rounded-lg py-3 px-1 transition hover:bg-green-50"
+                >
+                    📋 Læs regler
+                </button>
+                <RulesModal open={rulesModalOpen} onClose={() => setRulesModalOpen(false)} rules={course.rules ?? []} />
             </div>
         </div>
     );

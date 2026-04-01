@@ -15,6 +15,8 @@ export interface Course {
     phoneNumber?: string;
     email: string;
     holes: Hole[];
+    rules?: string[];
+    sport?: string;
 }
 
 export interface Hole {

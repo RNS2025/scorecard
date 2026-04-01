@@ -116,7 +116,7 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
 
                 <div className="flex flex-col gap-6">
                     {publishForms.map((form, i) => (
-                        <div key={i} className="bg-white border rounded-xl p-4 flex flex-col gap-3">
+                        <div key={i} className="shadow-lg rounded-xl p-4 flex flex-col gap-3">
                             <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">
                                 Spiller {i + 1}
                             </p>
@@ -182,7 +182,7 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
                     .map((player, originalIndex) => ({ player, originalIndex }))
                     .sort((a, b) => getPlayerTotal(a.player) - getPlayerTotal(b.player))
                     .map(({ player, originalIndex }, i) => (
-                        <div key={originalIndex} className="flex items-center justify-between bg-white border rounded-xl p-4">
+                        <div key={originalIndex} className="flex items-center justify-between shadow-lg rounded-xl p-4">
                             <div className="flex items-center gap-3">
                                 <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold
                                     ${i === 0 ? "bg-yellow-400 text-white" : "bg-gray-100 text-gray-500"}`}>
@@ -235,11 +235,11 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
             )}
 
             {/* Detaljeret scorekort */}
-            <div className="overflow-x-auto rounded-xl border">
+            <div className="overflow-x-auto rounded-xl shadow-lg">
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="bg-green-700 text-white">
-                            <th className="py-2 px-3 text-left sticky left-0 bg-green-700">Hul</th>
+                            <th className="py-2 px-3 text-left sticky left-0 bg-green-700 w-[10%]">Hul</th>
                             <th className="py-2 px-2 text-center">Par</th>
                             {game.players.map((p, i) => (
                                 <th key={i} className="py-2 px-2 text-center">{p.name.split(" ")[0]}</th>
@@ -277,6 +277,20 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
                     </tbody>
                 </table>
             </div>
+
+            {/* Del kamp */}
+            {allHolesPlayed && (
+                <button
+                    onClick={() => {
+                        const url = `${window.location.origin}/${course.id}/game/${game.id}/score-only`;
+                        navigator.clipboard.writeText(url).then();
+                        alert("Link kopieret!");
+                    }}
+                    className="w-full mt-4 shadow-lg text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
+                >
+                    🔗 Del kamp
+                </button>
+            )}
         </div>
     );
 };
