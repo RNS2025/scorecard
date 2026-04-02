@@ -4,6 +4,7 @@ import { useCourse } from "../../hooks/useCourses.ts";
 import { useCourseImage } from "../../hooks/useCourseImage.ts";
 import LeaderboardTable from "./LeaderboardTable.tsx";
 import RulesList from "./RulesList.tsx";
+import { getTotalPar } from "../../utils/parUtils.ts";
 
 const TvDashboardPage = () => {
     const { courseId } = useParams();
@@ -49,7 +50,10 @@ const TvDashboardPage = () => {
                     )}
                     <div>
                         <h1 className="text-3xl font-bold">{course.name}</h1>
-                        <p className="text-green-300 text-lg">{course.numberOfHoles} huller · Par {course.par}</p>
+                        <p className="text-green-300 text-lg">
+                            {course.numberOfHoles} huller
+                            {getTotalPar(course) !== undefined && ` · Par ${getTotalPar(course)}`}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -65,6 +69,7 @@ const TvDashboardPage = () => {
                         getDiffLabel={getDiffLabel}
                         getDiffColor={getDiffColor}
                         getMedalColor={getMedalColor}
+                        sport={course.sport}
                     />
                 </div>
 
@@ -76,6 +81,7 @@ const TvDashboardPage = () => {
                         getDiffLabel={getDiffLabel}
                         getDiffColor={getDiffColor}
                         getMedalColor={getMedalColor}
+                        sport={course.sport}
                     />
                 </div>
 

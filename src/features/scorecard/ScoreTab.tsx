@@ -6,6 +6,7 @@ import ScoreModal from "./ScoreModal.tsx";
 import { getScoreOptions } from "./scoreUtils.ts";
 import RulesModal from "../createGame/RulesModal.tsx";
 import HoleDescriptionModal from "./HoleDescriptionModal.tsx";
+import { getHolePar } from "../../utils/parUtils.ts";
 
 interface ScoreTabProps {
     game: Game;
@@ -13,7 +14,7 @@ interface ScoreTabProps {
     currentHole: number;
     setCurrentHole: (hole: number) => void;
     onScoreChange: (playerIndex: number, value: number | null) => void;
-    getPlayerDiffForHole: (score: number | null, par: number) => string | null;
+    getPlayerDiffForHole: (score: number | null, par: number | undefined) => string | null;
     getDiffColor: (diff: string | null) => string;
     goToStandingsTab: () => void;
 }
@@ -21,8 +22,9 @@ interface ScoreTabProps {
 const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, getPlayerDiffForHole, getDiffColor, goToStandingsTab }: ScoreTabProps) => {
     const { courseId } = useParams();
     const hole = course.holes[currentHole];
+    const holePar = getHolePar(course, currentHole);
     const [activePlayerIndex, setActivePlayerIndex] = useState<number | null>(null);
-    const scoreOptions = getScoreOptions(course.sport ?? "", hole.par);
+    const scoreOptions = getScoreOptions(course.sport ?? "", holePar ?? 0);
     const [rulesModalOpen, setRulesModalOpen] = useState(false);
     const [holeDescModalOpen, setHoleDescModalOpen] = useState(false);
 
@@ -36,7 +38,7 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                     onClose={() => setActivePlayerIndex(null)}
                     playerName={game.players[activePlayerIndex].name}
                     holeNumber={hole.number}
-                    holePar={hole.par}
+                    holePar={holePar ?? 0}
                     sport={course.sport ?? ""}
                     options={scoreOptions}
                     currentScore={game.players[activePlayerIndex].scores[currentHole]}
@@ -69,8 +71,10 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                 <div className="flex justify-between items-center">
                     <h2 className="text-xl font-bold">Hul {hole.number}</h2>
                     <div className="flex gap-4 text-sm text-gray-500">
-                        <span>Par <span className="font-bold text-gray-800">{hole.par}</span></span>
-                        <span>{hole.length}m</span>
+                        {holePar !== undefined && (
+                            <span>Par <span className="font-bold text-gray-800">{holePar}</span></span>
+                        )}
+                        {hole.length !== undefined && <span>{hole.length}m</span>}
                     </div>
                 </div>
             </div>
@@ -83,9 +87,11 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                         <div key={playerIndex} className="flex items-center justify-between shadow-lg rounded-xl p-4">
                             <div>
                                 <p className="font-semibold">{player.name}</p>
-                                <p className={`text-xs ${getDiffColor(getPlayerDiffForHole(score, hole.par))}`}>
-                                    {getPlayerDiffForHole(score, hole.par)}
-                                </p>
+                                {holePar !== undefined && (
+                                    <p className={`text-xs ${getDiffColor(getPlayerDiffForHole(score, holePar))}`}>
+                                        {getPlayerDiffForHole(score, holePar)}
+                                    </p>
+                                )}
                             </div>
                             <button
                                 onClick={() => setActivePlayerIndex(playerIndex)}

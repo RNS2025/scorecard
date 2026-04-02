@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePublishScores } from "../../hooks/useLeaderboard.ts";
 import type { LeaderboardEntry } from "../../utils/interfaces/Leaderboard.ts";
+import { getHolePar, getTotalPar, getShotLabel } from "../../utils/parUtils.ts";
 
 interface PublishForm {
     name: string;
@@ -17,7 +18,7 @@ interface OverviewTabProps {
     course: Course;
     getPlayerTotal: (player: Player) => number;
     getPlayerTotalDiff: (player: Player) => string;
-    getPlayerDiffForHole: (score: number | null, par: number) => string | null;
+    getPlayerDiffForHole: (score: number | null, par: number | undefined) => string | null;
     getDiffColor: (diff: string | null) => string;
 }
 
@@ -74,7 +75,7 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
         const entries: Omit<LeaderboardEntry, "id" | "createdAt">[] = publishForms.map((f, i) => {
             const player = game.players[selectedOriginalIndices[i]];
             const totalShots = player.scores.reduce((sum: number, s) => sum + (s ?? 0), 0);
-            const totalPar = course.holes.reduce((sum, h, hi) => player.scores[hi] !== null ? sum + h.par : sum, 0);
+            const totalPar = course.holes.reduce((sum, _h, hi) => player.scores[hi] !== null ? sum + (getHolePar(course, hi) ?? 0) : sum, 0);
             return {
                 playerName: f.name,
                 email: f.email,
@@ -194,7 +195,7 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="text-right">
-                                    <p className="text-lg font-bold">{getPlayerTotal(player)} spark</p>
+                                    <p className="text-lg font-bold">{getPlayerTotal(player)} {getShotLabel(course.sport)}</p>
                                     <p className={`text-xs ${getDiffColor(getPlayerTotalDiff(player))}`}>
                                         {getPlayerTotalDiff(player)}
                                     </p>
@@ -247,27 +248,30 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
                         </tr>
                     </thead>
                     <tbody>
-                        {course.holes.map((h, holeIndex) => (
-                            <tr key={h.number} className={holeIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                                <td className={`py-2 px-3 font-bold sticky left-0 ${holeIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
-                                    {h.number}
-                                </td>
-                                <td className="py-2 px-2 text-center text-gray-400">{h.par}</td>
-                                {game.players.map((player, pi) => {
-                                    const score = player.scores[holeIndex];
-                                    const diff = getPlayerDiffForHole(score, h.par);
-                                    return (
-                                        <td key={pi} className={`py-2 px-2 text-center ${getDiffColor(diff)}`}>
-                                            {score ?? "—"}
-                                        </td>
-                                    );
-                                })}
-                            </tr>
-                        ))}
+                        {course.holes.map((h, holeIndex) => {
+                            const hp = getHolePar(course, holeIndex);
+                            return (
+                                <tr key={h.number} className={holeIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                                    <td className={`py-2 px-3 font-bold sticky left-0 ${holeIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
+                                        {h.number}
+                                    </td>
+                                    <td className="py-2 px-2 text-center text-gray-400">{hp ?? "–"}</td>
+                                    {game.players.map((player, pi) => {
+                                        const score = player.scores[holeIndex];
+                                        const diff = hp !== undefined ? getPlayerDiffForHole(score, hp) : null;
+                                        return (
+                                            <td key={pi} className={`py-2 px-2 text-center ${getDiffColor(diff)}`}>
+                                                {score ?? "—"}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
                         {/* Total-række */}
                         <tr className="border-t-2 border-green-700 font-bold">
                             <td className="py-2 px-3 sticky left-0 bg-white">Total</td>
-                            <td className="py-2 px-2 text-center text-gray-400">{course.par}</td>
+                            <td className="py-2 px-2 text-center text-gray-400">{getTotalPar(course) ?? "–"}</td>
                             {game.players.map((player, pi) => (
                                 <td key={pi} className={`py-2 px-2 text-center ${getDiffColor(getPlayerTotalDiff(player))}`}>
                                     {getPlayerTotal(player)}

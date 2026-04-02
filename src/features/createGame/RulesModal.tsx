@@ -11,7 +11,7 @@ const RulesModal = ({ open, onClose, rules }: RulesModalProps) => {
         <Modal open={open} onClose={onClose} center>
             <div className="flex flex-col gap-4 text-black">
                 {rules.length > 0 ? (
-                    <ol className="list-decimal list-inside flex flex-col gap-2 text-sm">
+                    <ol className="list-decimal list-inside flex flex-col gap-2 text-sm mt-5">
                         {rules.map((rule, index) => (
                             <li key={index}>{rule}</li>
                         ))}

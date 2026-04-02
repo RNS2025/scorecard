@@ -6,6 +6,7 @@ export interface Game {
     numberOfPlayers: number;
     players: Player[];
     createdAt?: string;
+    matchFinished?: boolean;
 }
 
 export interface Player {

@@ -12,6 +12,8 @@ import {format as formatDate} from "date-fns";
 import {ArrowLeftIcon} from "@heroicons/react/24/solid";
 import RulesModal from "./RulesModal.tsx";
 import { useCourseImage } from "../../hooks/useCourseImage.ts";
+import { getTotalPar } from "../../utils/parUtils.ts";
+import DynamicModal from "./DynamicModal.tsx";
 
 const CreateGamePage = () => {
     const { courseId } = useParams();
@@ -34,6 +36,7 @@ const CreateGamePage = () => {
     const [gameName, setGameName] = useState<string>("");
     const [formatModalOpen, setFormatModalOpen] = useState(false);
     const [rulesModalOpen, setRulesModalOpen] = useState(false);
+    const [dynamicModalOpen, setDynamicModalOpen] = useState(false);
     const [playerCount, setPlayerCount] = useState<number>(0);
     const [playerNames, setPlayerNames] = useState<string[]>([]);
 
@@ -134,31 +137,55 @@ const CreateGamePage = () => {
                 )}
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className={`grid ${getTotalPar(course) !== undefined && course.length !== undefined ? 'grid-cols-3' : 'grid-cols-2'} gap-3`}>
                     <div className="bg-white/10 rounded-xl p-3 text-center">
                         <p className="text-2xl font-bold">{course.numberOfHoles}</p>
                         <p className="text-xs text-green-200">Huller</p>
                     </div>
-                    <div className="bg-white/10 rounded-xl p-3 text-center">
-                        <p className="text-2xl font-bold">{course.par}</p>
-                        <p className="text-xs text-green-200">Par</p>
-                    </div>
-                    <div className="bg-white/10 rounded-xl p-3 text-center">
-                        <p className="text-2xl font-bold">{course.length}</p>
-                        <p className="text-xs text-green-200">Meter</p>
-                    </div>
+                    {getTotalPar(course) !== undefined ? (
+                        <div className="bg-white/10 rounded-xl p-3 text-center">
+                            <p className="text-2xl font-bold">{getTotalPar(course)}</p>
+                            <p className="text-xs text-green-200">Par</p>
+                        </div>
+                    ) : (
+                        <div className="bg-white/10 rounded-xl p-3 text-center">
+                            <p className="text-2xl font-bold">-</p>
+                            <p className="text-xs text-green-200">Par</p>
+                        </div>
+                    )}
+                    {course.length !== undefined && (
+                        <div className="bg-white/10 rounded-xl p-3 text-center">
+                            <p className="text-2xl font-bold">{course.length}</p>
+                            <p className="text-xs text-green-200">Meter</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Difficulty badge */}
-                <div className="mt-4 flex items-center gap-2">
-                    <span className="text-xs text-green-200">Sværhedsgrad:</span>
-                    <span className="bg-white/20 text-sm font-medium px-3 py-0.5 rounded-full">
-                        {course.difficulty}
-                    </span>
-                </div>
+                {course.difficulty && (
+                    <div className="mt-4 flex items-center gap-2">
+                        <span className="text-xs text-green-200">Sværhedsgrad:</span>
+                        <span className="bg-white/20 text-sm font-medium px-3 py-0.5 rounded-full">
+                            {course.difficulty}
+                        </span>
+                    </div>
+                )}
 
-                {/* Kontaktinfo */}
-                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-green-200">
+                    {/* Dynamic badge */}
+                    {course.parMode === "calculated" && (
+                        <div onClick={() => setDynamicModalOpen(true)}
+                            className="mt-4 flex items-center gap-2">
+                            <span className="text-xs text-green-200">Partype:</span>
+                            <span className="animate-pulse bg-linear-to-r from-yellow-500 to-orange-500 text-sm font-medium px-3 py-0.5 rounded-full">
+                            Dynamisk
+                        </span>
+                        </div>
+                    )}
+                    <DynamicModal open={dynamicModalOpen} onClose={() => setDynamicModalOpen(false)} />
+
+
+                    {/* Kontaktinfo */}
+                <div className="mt-4 flex flex-col gap-x-4 gap-y-1 text-xs text-green-200">
                     {course.phoneNumber && <span>📞 {course.phoneNumber}</span>}
                     {course.email && <span>✉️ {course.email}</span>}
                     {course.website && <span>🌐 {course.website}</span>}

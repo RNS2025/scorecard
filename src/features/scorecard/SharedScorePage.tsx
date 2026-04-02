@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useGame } from "../../hooks/useGame.ts";
 import { useCourse } from "../../hooks/useCourses.ts";
 import type { Player } from "../../utils/interfaces/Game.ts";
+import { getHolePar, getTotalPar, getShotLabel, hasParData } from "../../utils/parUtils.ts";
 
 const SharedScorePage = () => {
     const { courseId, gameId } = useParams();
@@ -15,22 +16,28 @@ const SharedScorePage = () => {
         player.scores.reduce((sum: number, s) => sum + (s ?? 0), 0);
 
     const getPlayerTotalDiff = (player: Player) => {
+        if (!hasParData(course)) return "-";
         let totalPar = 0;
         let totalScore = 0;
+        let hasAnyPar = false;
         player.scores.forEach((s, i) => {
             if (s !== null) {
-                totalScore += s;
-                totalPar += course.holes[i].par;
+                const hp = getHolePar(course, i);
+                if (hp !== undefined) {
+                    totalScore += s;
+                    totalPar += hp;
+                    hasAnyPar = true;
+                }
             }
         });
-        if (totalScore === 0) return "-";
+        if (!hasAnyPar || totalScore === 0) return "-";
         const diff = totalScore - totalPar;
         if (diff === 0) return "Par";
         return diff > 0 ? `+${diff}` : `${diff}`;
     };
 
-    const getPlayerDiffForHole = (score: number | null, par: number) => {
-        if (score === null) return null;
+    const getPlayerDiffForHole = (score: number | null, par: number | undefined) => {
+        if (score === null || par === undefined) return null;
         const diff = score - par;
         if (diff === 0) return "Par";
         return diff > 0 ? `+${diff}` : `${diff}`;
@@ -52,7 +59,10 @@ const SharedScorePage = () => {
             {/* Header */}
             <div className="bg-linear-to-r from-green-600 to-green-800 text-white px-5 py-5">
                 <h1 className="text-xl font-bold">{game.name}</h1>
-                <p className="text-green-200 text-sm mt-1">{course.name} · {course.numberOfHoles} huller · Par {course.par}</p>
+                <p className="text-green-200 text-sm mt-1">
+                    {course.name} · {course.numberOfHoles} huller
+                    {getTotalPar(course) !== undefined && ` · Par ${getTotalPar(course)}`}
+                </p>
                 <p className="text-green-300 text-xs mt-1">{game.players.length} spillere</p>
             </div>
 
@@ -69,7 +79,7 @@ const SharedScorePage = () => {
                             <p className="font-semibold">{player.name}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-lg font-bold">{getPlayerTotal(player)} spark</p>
+                            <p className="text-lg font-bold">{getPlayerTotal(player)} {getShotLabel(course.sport)}</p>
                             <p className={`text-xs ${getDiffColor(getPlayerTotalDiff(player))}`}>
                                 {getPlayerTotalDiff(player)}
                             </p>
@@ -93,26 +103,29 @@ const SharedScorePage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {course.holes.map((h, holeIndex) => (
-                                <tr key={h.number} className={holeIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                                    <td className={`py-2 px-3 font-bold sticky left-0 ${holeIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
-                                        {h.number}
-                                    </td>
-                                    <td className="py-2 px-2 text-center text-gray-400">{h.par}</td>
-                                    {game.players.map((player, pi) => {
-                                        const score = player.scores[holeIndex];
-                                        const diff = getPlayerDiffForHole(score, h.par);
-                                        return (
-                                            <td key={pi} className={`py-2 px-2 text-center ${getDiffColor(diff)}`}>
-                                                {score ?? "—"}
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            ))}
+                            {course.holes.map((h, holeIndex) => {
+                                const hp = getHolePar(course, holeIndex);
+                                return (
+                                    <tr key={h.number} className={holeIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                                        <td className={`py-2 px-3 font-bold sticky left-0 ${holeIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
+                                            {h.number}
+                                        </td>
+                                        <td className="py-2 px-2 text-center text-gray-400">{hp ?? "–"}</td>
+                                        {game.players.map((player, pi) => {
+                                            const score = player.scores[holeIndex];
+                                            const diff = hp !== undefined ? getPlayerDiffForHole(score, hp) : null;
+                                            return (
+                                                <td key={pi} className={`py-2 px-2 text-center ${getDiffColor(diff)}`}>
+                                                    {score ?? "—"}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                );
+                            })}
                             <tr className="border-t-2 border-green-700 font-bold">
                                 <td className="py-2 px-3 sticky left-0 bg-white">Total</td>
-                                <td className="py-2 px-2 text-center text-gray-400">{course.par}</td>
+                                <td className="py-2 px-2 text-center text-gray-400">{getTotalPar(course) ?? "–"}</td>
                                 {game.players.map((player, pi) => (
                                     <td key={pi} className={`py-2 px-2 text-center ${getDiffColor(getPlayerTotalDiff(player))}`}>
                                         {getPlayerTotal(player)}

@@ -1,14 +1,16 @@
 import { TrophyIcon } from "@heroicons/react/24/solid";
 import type { LeaderboardEntry } from "../../utils/interfaces/Leaderboard.ts";
+import { getShotHeader } from "../../utils/parUtils.ts";
 
 interface LeaderboardTableProps {
     entries?: LeaderboardEntry[];
     getDiffLabel: (diff: number) => string;
     getDiffColor: (diff: number) => string;
     getMedalColor: (pos: number) => string;
+    sport?: string;
 }
 
-const LeaderboardTable = ({ entries, getDiffLabel, getDiffColor, getMedalColor }: LeaderboardTableProps) => {
+const LeaderboardTable = ({ entries, getDiffLabel, getDiffColor, getMedalColor, sport }: LeaderboardTableProps) => {
     if (!entries || entries.length === 0) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-white/5 rounded-2xl">
@@ -27,7 +29,7 @@ const LeaderboardTable = ({ entries, getDiffLabel, getDiffColor, getMedalColor }
                     <tr className="text-white/40 uppercase tracking-wider border-b border-white/10">
                         <th className="py-3 px-4 text-left w-12"></th>
                         <th className="py-3 px-4 text-left">Spiller</th>
-                        <th className="py-3 px-4 text-center">Spark</th>
+                        <th className="py-3 px-4 text-center">{getShotHeader(sport)}</th>
                         <th className="py-3 px-4 text-center">Score</th>
                     </tr>
                 </thead>
@@ -55,4 +57,3 @@ const LeaderboardTable = ({ entries, getDiffLabel, getDiffColor, getMedalColor }
 };
 
 export default LeaderboardTable;
-

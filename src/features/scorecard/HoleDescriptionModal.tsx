@@ -22,7 +22,7 @@ const HoleDescriptionModal = ({ open, onClose, courseId, holeNumber }: HoleDescr
                 )}
 
                 {isError && (
-                    <p className="text-sm text-gray-400 text-center py-8">Ingen banebeskrivelse for dette hul.</p>
+                    <p className="text-sm text-gray-400 text-center py-8 mt-5">Ingen banebeskrivelse for dette hul.</p>
                 )}
 
                 {imageUrl && (

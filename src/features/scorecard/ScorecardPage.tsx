@@ -7,6 +7,7 @@ import type { Game } from "../../utils/interfaces/Game.ts";
 import ScoreTab from "./ScoreTab.tsx";
 import StandingsTab from "./StandingsTab.tsx";
 import { useCourseImage } from "../../hooks/useCourseImage.ts";
+import { getHolePar, hasParData } from "../../utils/parUtils.ts";
 
 const ScorecardPage = () => {
     const { courseId, gameId } = useParams();
@@ -59,23 +60,29 @@ const ScorecardPage = () => {
     const getPlayerTotal = (player: Player) =>
         player.scores.reduce((sum: number, s) => sum + (s ?? 0), 0);
 
-    const getPlayerDiffForHole = (score: number | null, par: number) => {
-        if (score === null) return null;
+    const getPlayerDiffForHole = (score: number | null, par: number | undefined) => {
+        if (score === null || par === undefined) return null;
         const diff = score - par;
         if (diff === 0) return "Par";
         return diff > 0 ? `+${diff}` : `${diff}`;
     };
 
     const getPlayerTotalDiff = (player: Player) => {
+        if (!hasParData(course)) return "-";
         let totalPar = 0;
         let totalScore = 0;
+        let hasAnyPar = false;
         player.scores.forEach((s, i) => {
             if (s !== null) {
-                totalScore += s;
-                totalPar += course.holes[i].par;
+                const hp = getHolePar(course, i);
+                if (hp !== undefined) {
+                    totalScore += s;
+                    totalPar += hp;
+                    hasAnyPar = true;
+                }
             }
         });
-        if (totalScore === 0) return "-";
+        if (!hasAnyPar || totalScore === 0) return "-";
         const diff = totalScore - totalPar;
         if (diff === 0) return "Par";
         return diff > 0 ? `+${diff}` : `${diff}`;

@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { da } from "date-fns/locale";
 import { TrophyIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
 import scorecard_logo from "../../assets/scorecard logo.png";
+import { getTotalPar, getShotLabel } from "../../utils/parUtils.ts";
 
 type Period = "all" | "month" | "week";
 
@@ -60,7 +61,8 @@ const LeaderboardPage = () => {
 
                 {course && (
                     <p className="text-green-200 text-sm ml-10">
-                        {course.name} · {course.numberOfHoles} huller · Par {course.par}
+                        {course.name} · {course.numberOfHoles} huller
+                        {getTotalPar(course) !== undefined && ` · Par ${getTotalPar(course)}`}
                     </p>
                 )}
             </div>
@@ -114,7 +116,7 @@ const LeaderboardPage = () => {
                                     <p className="text-sm font-semibold mt-2 text-center leading-tight max-w-20 truncate">
                                         {entries[1].playerName.split(" ")[0]}
                                     </p>
-                                    <p className="text-xs text-gray-500">{entries[1].totalShots} spark</p>
+                                    <p className="text-xs text-gray-500">{entries[1].totalShots} {getShotLabel(course?.sport)}</p>
                                     <p className={`text-xs font-bold ${getDiffColor(entries[1].totalDiff)}`}>
                                         {getDiffLabel(entries[1].totalDiff)}
                                     </p>
@@ -128,7 +130,7 @@ const LeaderboardPage = () => {
                                     <p className="text-sm font-bold mt-2 text-center leading-tight max-w-22.5 truncate">
                                         {entries[0].playerName.split(" ")[0]}
                                     </p>
-                                    <p className="text-xs text-gray-500">{entries[0].totalShots} spark</p>
+                                    <p className="text-xs text-gray-500">{entries[0].totalShots} {getShotLabel(course?.sport)}</p>
                                     <p className={`text-xs font-bold ${getDiffColor(entries[0].totalDiff)}`}>
                                         {getDiffLabel(entries[0].totalDiff)}
                                     </p>
@@ -142,7 +144,7 @@ const LeaderboardPage = () => {
                                     <p className="text-sm font-semibold mt-2 text-center leading-tight max-w-20 truncate">
                                         {entries[2].playerName.split(" ")[0]}
                                     </p>
-                                    <p className="text-xs text-gray-500">{entries[2].totalShots} spark</p>
+                                    <p className="text-xs text-gray-500">{entries[2].totalShots} {getShotLabel(course?.sport)}</p>
                                     <p className={`text-xs font-bold ${getDiffColor(entries[2].totalDiff)}`}>
                                         {getDiffLabel(entries[2].totalDiff)}
                                     </p>
@@ -197,7 +199,7 @@ const LeaderboardPage = () => {
                                     <p className="text-xl font-bold text-gray-700">
                                         {entries.length}
                                     </p>
-                                    <p className="text-xs text-gray-400">Runder spillet</p>
+                                    <p className="text-xs text-gray-400">Publicerede runder</p>
                                 </div>
                             </div>
                         )}
