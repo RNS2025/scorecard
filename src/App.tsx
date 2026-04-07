@@ -4,6 +4,7 @@ import CreateGamePage from "./features/createGame/CreateGamePage.tsx";
 import ScorecardPage from "./features/scorecard/ScorecardPage.tsx";
 import SharedScorePage from "./features/scorecard/SharedScorePage.tsx";
 import TvDashboardPage from "./features/dashboard/TvDashboardPage.tsx";
+import DashboardList from "./features/dashboard/DashboardList.tsx";
 import LeaderboardPage from "./features/leaderboard/LeaderboardPage.tsx";
 import LoginPage from "./features/admin/LoginPage.tsx";
 import DashboardPage from "./features/admin/dashboard/DashboardPage.tsx";
@@ -20,6 +21,9 @@ function App() {
           <Route path="/:courseId/game/:gameId" element={<ScorecardPage />} />
           <Route path="/:courseId/game/:gameId/score-only" element={<SharedScorePage />} />
           <Route path="/:courseId/leaderboard" element={<LeaderboardPage />} />
+
+
+          <Route path="/dashboard" element={<DashboardList />} />
           <Route path="/:courseId/dashboard" element={<TvDashboardPage />} />
 
           <Route path="/admin" element={<LoginPage />} />

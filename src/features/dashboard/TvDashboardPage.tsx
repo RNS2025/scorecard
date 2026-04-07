@@ -43,11 +43,8 @@ const TvDashboardPage = () => {
         <div className="h-screen bg-gray-950 text-white flex flex-col overflow-hidden cursor-none select-none">
 
             {/* Header */}
-            <div className="flex items-center justify-between px-10 py-5 bg-linear-to-r from-green-700 to-green-900 shrink-0">
+            <div className="grid grid-cols-3 items-center justify-between px-10 py-3 bg-linear-to-r from-green-700 to-green-900 shrink-0">
                 <div className="flex items-center gap-6">
-                    {logoUrl && (
-                        <img src={logoUrl} alt="Logo" className="h-14 object-contain" />
-                    )}
                     <div>
                         <h1 className="text-3xl font-bold">{course.name}</h1>
                         <p className="text-green-300 text-lg">
@@ -56,6 +53,12 @@ const TvDashboardPage = () => {
                         </p>
                     </div>
                 </div>
+
+                {logoUrl && (
+                    <div className="flex justify-center gap-4">
+                    <img src={logoUrl} alt="Logo" className="h-20 object-contain" />
+                    </div>
+                )}
             </div>
 
             {/* Content – 3 kolonner */}
