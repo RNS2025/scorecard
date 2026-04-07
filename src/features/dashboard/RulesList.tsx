@@ -12,12 +12,11 @@ const RulesList = ({ rules }: RulesListProps) => {
     }
 
     return (
-        <div className="flex-1 flex flex-col gap-3 overflow-y-auto pr-2">
+        <div className="h-full bg-white/5 rounded-xl flex flex-col gap-5 py-2 overflow-y-auto pr-2">
             {rules.map((rule, i) => (
                 <div
                     key={i}
-                    className="flex-1 flex gap-3 items-center bg-white/5 rounded-xl px-5"
-                    style={{ minHeight: `${100 / rules.length}%` }}
+                    className="flex gap-4 items-center px-5"
                 >
                     <span className="shrink-0 w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-sm font-bold">
                         {i + 1}

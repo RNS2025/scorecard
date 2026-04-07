@@ -196,14 +196,14 @@ const CreateGamePage = () => {
             <div className="mt-4 flex flex-col gap-5">
             <button
                 onClick={() => navigate(`/${courseId}/leaderboard`)}
-                className="w-full border-2 border-green-700 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
+                className="w-full shadow-xl border border-gray-200 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
             >
                 🏆 Se Rangliste
             </button>
 
             <button
                 onClick={() => setRulesModalOpen(true)}
-                className="w-full border-2 border-green-700 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
+                className="w-full shadow-xl border border-gray-200 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
             >
                 📋 Læs regler
             </button>

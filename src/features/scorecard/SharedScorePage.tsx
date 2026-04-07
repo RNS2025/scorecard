@@ -3,6 +3,8 @@ import { useGame } from "../../hooks/useGame.ts";
 import { useCourse } from "../../hooks/useCourses.ts";
 import type { Player } from "../../utils/interfaces/Game.ts";
 import { getHolePar, getTotalPar, getShotLabel, hasParData } from "../../utils/parUtils.ts";
+import {format} from "date-fns";
+import {da} from "date-fns/locale";
 
 const SharedScorePage = () => {
     const { courseId, gameId } = useParams();
@@ -59,6 +61,7 @@ const SharedScorePage = () => {
             {/* Header */}
             <div className="bg-linear-to-r from-green-600 to-green-800 text-white px-5 py-5">
                 <h1 className="text-xl font-bold">{game.name}</h1>
+                <p className="text-green-200 text-sm mt-1">{game.createdAt && format(game.createdAt, 'dd/MM/yyyy', {locale: da})}</p>
                 <p className="text-green-200 text-sm mt-1">
                     {course.name} · {course.numberOfHoles} huller
                     {getTotalPar(course) !== undefined && ` · Par ${getTotalPar(course)}`}
@@ -70,7 +73,7 @@ const SharedScorePage = () => {
             <div className="px-4 py-5 flex flex-col gap-3">
                 <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wide">Stilling</h2>
                 {sorted.map(({ player, originalIndex }, i) => (
-                    <div key={originalIndex} className="flex items-center justify-between bg-white border rounded-xl p-4">
+                    <div key={originalIndex} className="flex items-center justify-between shadow-lg rounded-xl p-4">
                         <div className="flex items-center gap-3">
                             <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold
                                 ${i === 0 ? "bg-yellow-400 text-white" : "bg-gray-100 text-gray-500"}`}>

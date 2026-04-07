@@ -104,7 +104,7 @@ const ScorecardPage = () => {
                 </div>
 
                 <span onClick={() => {
-                    const newRound = confirm("Er du sikker på at du vil afslutte runden? Denne runde bliver ikke gemt.");
+                    const newRound = confirm("Er du sikker på at du vil afslutte runden? Du vil blive ført tilbage spiloprettelse.");
                     if (newRound) {
                         navigate(`/${courseId}/creategame`)
                     }
