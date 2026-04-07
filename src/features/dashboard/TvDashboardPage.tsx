@@ -73,6 +73,7 @@ const TvDashboardPage = () => {
                         getDiffColor={getDiffColor}
                         getMedalColor={getMedalColor}
                         sport={course.sport}
+                        parMode={course.parMode}
                     />
                 </div>
 
@@ -85,6 +86,7 @@ const TvDashboardPage = () => {
                         getDiffColor={getDiffColor}
                         getMedalColor={getMedalColor}
                         sport={course.sport}
+                        parMode={course.parMode}
                     />
                 </div>
 

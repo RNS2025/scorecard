@@ -8,9 +8,10 @@ interface LeaderboardTableProps {
     getDiffColor: (diff: number) => string;
     getMedalColor: (pos: number) => string;
     sport?: string;
+    parMode?: string;
 }
 
-const LeaderboardTable = ({ entries, getDiffLabel, getDiffColor, getMedalColor, sport }: LeaderboardTableProps) => {
+const LeaderboardTable = ({ entries, getDiffLabel, getDiffColor, getMedalColor, sport, parMode }: LeaderboardTableProps) => {
     if (!entries || entries.length === 0) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-white/5 rounded-2xl">
@@ -30,7 +31,9 @@ const LeaderboardTable = ({ entries, getDiffLabel, getDiffColor, getMedalColor, 
                         <th className="py-3 px-4 text-left w-12"></th>
                         <th className="py-3 px-4 text-left">Spiller</th>
                         <th className="py-3 px-4 text-center">{getShotHeader(sport)}</th>
+                        {parMode !== "calculated" && (
                         <th className="py-3 px-4 text-center">Score</th>
+                        )}
                     </tr>
                 </thead>
                 <tbody>
@@ -44,10 +47,12 @@ const LeaderboardTable = ({ entries, getDiffLabel, getDiffColor, getMedalColor, 
                                 </span>
                             </td>
                             <td className="px-4 font-semibold">{entry.playerName}</td>
-                            <td className="px-4 text-center text-white/70">{entry.totalShots}</td>
+                            <td className="px-4 text-center text-white">{entry.totalShots}</td>
+                            {parMode !== "calculated" && (
                             <td className={`px-4 text-center font-bold ${getDiffColor(entry.totalDiff)}`}>
                                 {getDiffLabel(entry.totalDiff)}
                             </td>
+                                )}
                         </tr>
                     ))}
                 </tbody>
