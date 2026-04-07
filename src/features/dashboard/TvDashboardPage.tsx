@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useLeaderboard } from "../../hooks/useLeaderboard.ts";
+import { useLiveLeaderboard } from "../../hooks/useLiveLeaderboard.ts";
 import { useCourse } from "../../hooks/useCourses.ts";
 import { useCourseImage } from "../../hooks/useCourseImage.ts";
 import LeaderboardTable from "./LeaderboardTable.tsx";
@@ -9,8 +9,8 @@ import { getTotalPar } from "../../utils/parUtils.ts";
 const TvDashboardPage = () => {
     const { courseId } = useParams();
     const { data: course } = useCourse(String(courseId));
-    const { data: allTimeEntries } = useLeaderboard(courseId, "all");
-    const { data: monthEntries } = useLeaderboard(courseId, "month");
+    const { data: allTimeEntries } = useLiveLeaderboard(courseId, "all");
+    const { data: monthEntries } = useLiveLeaderboard(courseId, "month");
     const { data: logoUrl } = useCourseImage(String(courseId), "logo");
 
     const getDiffLabel = (diff: number) => {
