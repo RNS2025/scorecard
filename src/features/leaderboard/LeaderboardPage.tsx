@@ -12,7 +12,7 @@ type Period = "all" | "month" | "week";
 
 const periodLabels: Record<Period, string> = {
     all: "All-time",
-    month: "Seneste måned",
+    month: "Denne måned",
     week: "Seneste uge",
 };
 

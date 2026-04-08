@@ -48,7 +48,7 @@ const getLeaderboard = async (req, res) => {
             if (period === 'week') {
                 startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
             } else if (period === 'month') {
-                startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
             }
 
             if (startDate) {

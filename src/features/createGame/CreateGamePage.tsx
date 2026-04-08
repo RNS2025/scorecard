@@ -37,6 +37,7 @@ const CreateGamePage = () => {
     const [formatModalOpen, setFormatModalOpen] = useState(false);
     const [rulesModalOpen, setRulesModalOpen] = useState(false);
     const [dynamicModalOpen, setDynamicModalOpen] = useState(false);
+    const [startMatchEnabled, setStartMatchEnabled] = useState(false);
     const [playerCount, setPlayerCount] = useState<number>(0);
     const [playerNames, setPlayerNames] = useState<string[]>([]);
 
@@ -194,11 +195,18 @@ const CreateGamePage = () => {
             </div>
 
             <div className="mt-4 flex flex-col gap-5">
+                <button
+                    onClick={() => setStartMatchEnabled((prev) => !prev)}
+                    className={`w-full shadow-xl ${startMatchEnabled ? 'bg-green-500 text-white' : ''} border border-gray-200 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50`}
+                >
+                    🎯 Start kamp
+                </button>
+
             <button
                 onClick={() => navigate(`/${courseId}/leaderboard`)}
                 className="w-full shadow-xl border border-gray-200 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
             >
-                🏆 Se Rangliste
+                🏆 Se rangliste
             </button>
 
             <button
@@ -213,8 +221,9 @@ const CreateGamePage = () => {
             </div>
 
             {/* Formular */}
+            {startMatchEnabled && (
             <div className="mt-8 flex flex-col gap-5">
-                <h2 className="text-lg font-bold">Opret spil</h2>
+                <h2 className="text-lg font-bold">Opret kamp</h2>
 
                 {/* Format */}
                 <div className="flex flex-col gap-2">
@@ -302,6 +311,7 @@ const CreateGamePage = () => {
                 )}
             </div>
             </div>
+            )}
 
         </div>
     );

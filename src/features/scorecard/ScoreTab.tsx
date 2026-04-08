@@ -79,6 +79,13 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                 </div>
             </div>
 
+            {/* Farve-legend */}
+            <div className="flex justify-center gap-4 text-xs text-gray-500 pb-3">
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-700 inline-block" /> Under par</span>
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-gray-300 inline-block" /> Par</span>
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-600 inline-block" /> Over par</span>
+            </div>
+
             {/* Score-input per spiller */}
             <div className="flex flex-col gap-4">
                 {game.players.map((player, playerIndex) => {
@@ -96,9 +103,15 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                             <button
                                 onClick={() => setActivePlayerIndex(playerIndex)}
                                 className={`w-14 h-14 rounded-xl text-xl font-bold transition
-                                    ${score !== null
-                                        ? "bg-green-700 text-white"
-                                        : "bg-gray-100 text-gray-400 border-2 border-dashed border-gray-300"}`}
+                                    ${score === null
+                                        ? "bg-gray-100 text-gray-400 border-2 border-dashed border-gray-300"
+                                        : holePar === undefined
+                                            ? "bg-green-700 text-white"
+                                            : score < holePar
+                                                ? "bg-green-700 text-white"
+                                                : score === holePar
+                                                    ? "bg-gray-100 text-gray-600"
+                                                    : "bg-red-600 text-white"}`}
                             >
                                 {score ?? "—"}
                             </button>
