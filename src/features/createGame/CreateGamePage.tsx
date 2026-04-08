@@ -33,7 +33,7 @@ const CreateGamePage = () => {
     }, [logoUrl]);
 
     const [format, setFormat] = useState<string>("slagspil")
-    const [gameName, setGameName] = useState<string>("");
+    const [gameName, setGameName] = useState<string>(formatDate(new Date(), "dd/MM/yyyy", { locale: da }));
     const [formatModalOpen, setFormatModalOpen] = useState(false);
     const [rulesModalOpen, setRulesModalOpen] = useState(false);
     const [dynamicModalOpen, setDynamicModalOpen] = useState(false);
@@ -202,6 +202,109 @@ const CreateGamePage = () => {
                     🎯 Start kamp
                 </button>
 
+                {/* Formular */}
+                {startMatchEnabled && (
+                    <div className="mt-8 flex flex-col gap-5">
+
+                        {/* Format */}
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm font-medium">Format</label>
+                                <InformationCircleIcon onClick={() => setFormatModalOpen(true)} className="size-6 text-blue-400" />
+                            </div>
+
+                            <FormatModal open={formatModalOpen} onClose={() => setFormatModalOpen(false)} />
+
+                            <div>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormat("slagspil")}
+                                    className={`py-2 px-4 rounded-lg font-medium text-sm transition w-full
+                                    ${format === "slagspil"
+                                        ? "bg-green-700 text-white"
+                                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                                >
+                                    Slagspil
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Kampnavn */}
+                        <label htmlFor="gameName" className="text-sm font-medium -mb-3">Kampnavn</label>
+                        <div className="grid grid-cols-[80%_20%] gap-2 items-center h-full">
+                            <input
+                                id="gameName"
+                                type="text"
+                                placeholder="Er feltet tomt sættes dagens dato som navn"
+                                value={gameName}
+                                onChange={(e) => setGameName(e.target.value)}
+                                className="w-full p-3
+                                 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-xs"
+                            />
+
+
+                                <button
+                                    type="button"
+                                    onClick={() => setGameName("")}
+                                    className={`p-3 rounded-lg transition w-full border border-gray-300
+                                    ${gameName.trim() === "" ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-500"}`}
+                                >
+                                    Ryd
+                                </button>
+                        </div>
+
+                        {/* Antal spillere */}
+                        <div className="flex flex-col gap-2">
+                            <label className="text-sm font-medium">Antal spillere</label>
+                            <div className="grid grid-cols-4 gap-2">
+                                {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
+                                    <button
+                                        key={count}
+                                        type="button"
+                                        onClick={() => handlePlayerCountChange(count)}
+                                        className={`py-2 rounded-lg font-medium text-sm transition
+                                        ${playerCount === count
+                                            ? "bg-green-700 text-white"
+                                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                                    >
+                                        {count}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Spillernavne */}
+                        {playerCount > 0 && (
+                            <div className="flex flex-col gap-3">
+                                <label className="text-sm font-medium">Spillernavne</label>
+                                {playerNames.map((name, index) => (
+                                    <input
+                                        key={index}
+                                        type="text"
+                                        placeholder={`Spiller ${index + 1}`}
+                                        value={name}
+                                        onChange={(e) => handlePlayerNameChange(index, e.target.value)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="flex flex-col gap-2">
+
+                            {playerCount > 0 && playerNames.every((name) => name.trim()) && (
+                                <button
+                                    onClick={() => handleCreateGame()}
+                                    className="w-full bg-linear-to-r from-green-500 to-green-800 text-white font-bold
+                                    rounded-lg py-3 px-4 transition hover:opacity-90 mb-10"
+                                >
+                                    Start spil
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
+
             <button
                 onClick={() => navigate(`/${courseId}/leaderboard`)}
                 className="w-full shadow-xl border border-gray-200 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
@@ -219,99 +322,6 @@ const CreateGamePage = () => {
             <RulesModal open={rulesModalOpen} onClose={() => setRulesModalOpen(false)} rules={course.rules ?? []} />
 
             </div>
-
-            {/* Formular */}
-            {startMatchEnabled && (
-            <div className="mt-8 flex flex-col gap-5">
-                <h2 className="text-lg font-bold">Opret kamp</h2>
-
-                {/* Format */}
-                <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium">Format</label>
-                        <InformationCircleIcon onClick={() => setFormatModalOpen(true)} className="size-6 text-blue-400" />
-                    </div>
-
-                    <FormatModal open={formatModalOpen} onClose={() => setFormatModalOpen(false)} />
-
-                    <div className="grid grid-cols-1 gap-2">
-                        <button
-                            type="button"
-                            onClick={() => setFormat("slagspil")}
-                            className={`py-2 px-4 rounded-lg font-medium text-sm transition
-                                ${format === "slagspil"
-                                ? "bg-green-700 text-white"
-                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-                        >
-                            Slagspil
-                        </button>
-                    </div>
-                </div>
-
-                {/* Kampnavn */}
-                <div className="flex flex-col gap-2">
-                    <label htmlFor="gameName" className="text-sm font-medium">Kampnavn</label>
-                    <input
-                        id="gameName"
-                        type="text"
-                        placeholder="F.eks. Søndagsrunden"
-                        value={gameName}
-                        onChange={(e) => setGameName(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                </div>
-
-                {/* Antal spillere */}
-                <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium">Antal spillere</label>
-                    <div className="grid grid-cols-4 gap-2">
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
-                            <button
-                                key={count}
-                                type="button"
-                                onClick={() => handlePlayerCountChange(count)}
-                                className={`py-2 rounded-lg font-medium text-sm transition
-                    ${playerCount === count
-                                    ? "bg-green-700 text-white"
-                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-                            >
-                                {count}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Spillernavne */}
-                {playerCount > 0 && (
-                    <div className="flex flex-col gap-3">
-                        <label className="text-sm font-medium">Spillernavne</label>
-                        {playerNames.map((name, index) => (
-                            <input
-                                key={index}
-                                type="text"
-                                placeholder={`Spiller ${index + 1}`}
-                                value={name}
-                                onChange={(e) => handlePlayerNameChange(index, e.target.value)}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                            />
-                        ))}
-                    </div>
-                )}
-
-                <div className="flex flex-col gap-2">
-
-                {playerCount > 0 && playerNames.every((name) => name.trim()) && (
-                <button
-                    onClick={() => handleCreateGame()}
-                    className="w-full bg-linear-to-r from-green-500 to-green-800 text-white font-bold
-                    rounded-lg py-3 px-4 transition hover:opacity-90"
-                >
-                    Start spil
-                </button>
-                )}
-            </div>
-            </div>
-            )}
 
         </div>
     );

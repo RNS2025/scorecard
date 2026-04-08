@@ -27,7 +27,7 @@ const getAdminLeaderboard = async (req, res) => {
             createdAt: doc.data().createdAt?.toDate?.()?.toISOString() ?? null,
         }));
 
-        entries.sort((a, b) => a.totalDiff - b.totalDiff);
+        entries.sort((a, b) => a.totalShots - b.totalShots);
 
         return res.json(entries);
     } catch (error) {

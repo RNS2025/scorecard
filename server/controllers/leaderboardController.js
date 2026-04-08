@@ -33,12 +33,12 @@ const getLeaderboard = async (req, res) => {
     try {
         const { courseId, period } = req.query;
 
-        let query = db.collection('leaderboard').orderBy('totalDiff', 'asc');
+        let query = db.collection('leaderboard').orderBy('totalShots', 'asc');
 
         if (courseId) {
             query = db.collection('leaderboard')
                 .where('courseId', '==', courseId)
-                .orderBy('totalDiff', 'asc');
+                .orderBy('totalShots', 'asc');
         }
 
         if (period && period !== 'all') {

@@ -12,7 +12,7 @@ export const useLiveLeaderboard = (courseId?: string, period?: string) => {
 
         const constraints = [
             where("courseId", "==", courseId),
-            orderBy("totalDiff", "asc"),
+            orderBy("totalShots", "asc"),
         ];
 
         if (period && period !== "all") {

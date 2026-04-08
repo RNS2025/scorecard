@@ -24,6 +24,7 @@ const LeaderboardPage = () => {
     const { data: entries, isLoading: lbLoading } = useLeaderboard(courseId, period);
 
     const isLoading = courseLoading || lbLoading;
+    const showDiff = course?.parMode !== "calculated";
 
     const getDiffLabel = (diff: number) => {
         if (diff === 0) return "Par";
@@ -117,9 +118,11 @@ const LeaderboardPage = () => {
                                         {entries[1].playerName.split(" ")[0]}
                                     </p>
                                     <p className="text-xs text-gray-500">{entries[1].totalShots} {getShotLabel(course?.sport)}</p>
-                                    <p className={`text-xs font-bold ${getDiffColor(entries[1].totalDiff)}`}>
-                                        {getDiffLabel(entries[1].totalDiff)}
-                                    </p>
+                                    {showDiff && (
+                                        <p className={`text-xs font-bold ${getDiffColor(entries[1].totalDiff)}`}>
+                                            {getDiffLabel(entries[1].totalDiff)}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* 1. plads */}
@@ -131,9 +134,11 @@ const LeaderboardPage = () => {
                                         {entries[0].playerName.split(" ")[0]}
                                     </p>
                                     <p className="text-xs text-gray-500">{entries[0].totalShots} {getShotLabel(course?.sport)}</p>
-                                    <p className={`text-xs font-bold ${getDiffColor(entries[0].totalDiff)}`}>
-                                        {getDiffLabel(entries[0].totalDiff)}
-                                    </p>
+                                    {showDiff && (
+                                        <p className={`text-xs font-bold ${getDiffColor(entries[0].totalDiff)}`}>
+                                            {getDiffLabel(entries[0].totalDiff)}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* 3. plads */}
@@ -145,9 +150,11 @@ const LeaderboardPage = () => {
                                         {entries[2].playerName.split(" ")[0]}
                                     </p>
                                     <p className="text-xs text-gray-500">{entries[2].totalShots} {getShotLabel(course?.sport)}</p>
-                                    <p className={`text-xs font-bold ${getDiffColor(entries[2].totalDiff)}`}>
-                                        {getDiffLabel(entries[2].totalDiff)}
-                                    </p>
+                                    {showDiff && (
+                                        <p className={`text-xs font-bold ${getDiffColor(entries[2].totalDiff)}`}>
+                                            {getDiffLabel(entries[2].totalDiff)}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -178,9 +185,11 @@ const LeaderboardPage = () => {
                                     {/* Score */}
                                     <div className="text-right shrink-0">
                                         <p className="text-lg font-bold">{entry.totalShots}</p>
-                                        <p className={`text-xs font-bold ${getDiffColor(entry.totalDiff)}`}>
-                                            {getDiffLabel(entry.totalDiff)}
-                                        </p>
+                                        {showDiff && (
+                                            <p className={`text-xs font-bold ${getDiffColor(entry.totalDiff)}`}>
+                                                {getDiffLabel(entry.totalDiff)}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             ))}
