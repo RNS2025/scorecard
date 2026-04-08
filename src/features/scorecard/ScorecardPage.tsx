@@ -159,7 +159,7 @@ const ScorecardPage = () => {
 
             {/* Banelogo */}
             {logoUrl && (
-                <div className="flex justify-center py-8">
+                <div className="flex justify-center">
                     <img src={logoUrl} alt="Banens logo" className="h-12 object-contain" />
                 </div>
             )}
