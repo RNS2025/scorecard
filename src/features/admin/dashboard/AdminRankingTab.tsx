@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TrophyIcon } from "@heroicons/react/24/solid";
 import { format } from "date-fns";
 import { da } from "date-fns/locale";
-import { useAdminLeaderboard } from "../../../hooks/useAdmin.ts";
 import type { LeaderboardEntry } from "../../../utils/interfaces/Leaderboard.ts";
+import AdminService from "../../../services/AdminService.ts";
 
 type Period = "all" | "month" | "week";
+
+const monthNames = [
+    "Januar", "Februar", "Marts", "April", "Maj", "Juni",
+    "Juli", "August", "September", "Oktober", "November", "December"
+];
 
 const getDiffLabel = (diff: number) => {
     if (diff === 0) return "Par";
@@ -19,8 +24,56 @@ const getDiffColor = (diff: number) => {
 };
 
 const AdminRankingTab = () => {
+    const now = new Date();
     const [period, setPeriod] = useState<Period>("all");
-    const { data: leaderboard, isLoading } = useAdminLeaderboard(period);
+    const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
+    const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+    const [allEntries, setAllEntries] = useState<LeaderboardEntry[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Fetch all entries once
+    useEffect(() => {
+        let cancelled = false;
+        AdminService.getLeaderboard().then((data) => {
+            if (!cancelled) {
+                setAllEntries(data);
+                setIsLoading(false);
+            }
+        }).catch(() => {
+            if (!cancelled) setIsLoading(false);
+        });
+        return () => { cancelled = true; };
+    }, []);
+
+    // Filter client-side — pure derivation, no state
+    const getFilteredLeaderboard = (): LeaderboardEntry[] => {
+        if (period === "all") return allEntries;
+
+        if (period === "week") {
+            const startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            return allEntries.filter(e => e.createdAt && new Date(e.createdAt) >= startDate);
+        }
+
+        if (period === "month") {
+            const startDate = new Date(selectedYear, selectedMonth, 1);
+            const endDate = new Date(selectedYear, selectedMonth + 1, 1);
+            return allEntries.filter(e => {
+                if (!e.createdAt) return false;
+                const d = new Date(e.createdAt);
+                return d >= startDate && d < endDate;
+            });
+        }
+
+        return allEntries;
+    };
+
+    const leaderboard = getFilteredLeaderboard();
+
+    // Generate year options from 2024 to current year
+    const yearOptions: number[] = [];
+    for (let y = now.getFullYear(); y >= 2026; y--) {
+        yearOptions.push(y);
+    }
 
     return (
         <div>
@@ -43,6 +96,30 @@ const AdminRankingTab = () => {
                     </button>
                 ))}
             </div>
+
+            {/* Month/Year picker */}
+            {period === "month" && (
+                <div className="flex gap-2 mb-4">
+                    <select
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                        className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                        {monthNames.map((name, i) => (
+                            <option key={i} value={i}>{name}</option>
+                        ))}
+                    </select>
+                    <select
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(Number(e.target.value))}
+                        className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                        {yearOptions.map((y) => (
+                            <option key={y} value={y}>{y}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
 
             {isLoading && <p className="text-center animate-pulse text-gray-400">Henter rangliste...</p>}
 

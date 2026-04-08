@@ -16,33 +16,18 @@ const getProfile = async (req, res) => {
 const getAdminLeaderboard = async (req, res) => {
     try {
         const { courseId } = req.admin;
-        const { period } = req.query;
 
-        let query = db.collection('leaderboard')
+        const snapshot = await db.collection('leaderboard')
             .where('courseId', '==', courseId)
-            .orderBy('totalDiff', 'asc');
+            .get();
 
-        if (period && period !== 'all') {
-            const now = new Date();
-            let startDate;
-
-            if (period === 'week') {
-                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            } else if (period === 'month') {
-                startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-            }
-
-            if (startDate) {
-                query = query.where('createdAt', '>=', startDate);
-            }
-        }
-
-        const snapshot = await query.get();
         const entries = snapshot.docs.map(doc => ({
-            id: doc.id,
             ...doc.data(),
+            id: doc.id,
             createdAt: doc.data().createdAt?.toDate?.()?.toISOString() ?? null,
         }));
+
+        entries.sort((a, b) => a.totalDiff - b.totalDiff);
 
         return res.json(entries);
     } catch (error) {
@@ -108,10 +93,10 @@ const getAdminStats = async (req, res) => {
         });
 
         // This month
-        const oneMonthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const thisMonth = entries.filter(e => {
             const date = e.createdAt?.toDate?.();
-            return date && date >= oneMonthAgo;
+            return date && date >= monthStart;
         });
 
         const marketingCount = entries.filter(e => e.marketingConsent).length;

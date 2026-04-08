@@ -15,10 +15,10 @@ export const useAdminStats = () => {
     });
 };
 
-export const useAdminLeaderboard = (period?: string) => {
+export const useAdminLeaderboard = () => {
     return useQuery({
-        queryKey: ['admin', 'leaderboard', period],
-        queryFn: () => AdminService.getLeaderboard(period),
+        queryKey: ['admin', 'leaderboard'],
+        queryFn: AdminService.getLeaderboard,
     });
 };
 

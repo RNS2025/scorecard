@@ -18,7 +18,7 @@ const publishScores = async (req, res) => {
                 ...entry,
                 createdAt: FieldValue.serverTimestamp(),
             });
-            results.push({ id: docRef.id, ...entry });
+            results.push({ ...entry, id: docRef.id });
         }
 
         await batch.commit();
@@ -58,8 +58,8 @@ const getLeaderboard = async (req, res) => {
 
         const snapshot = await query.get();
         const leaderboard = snapshot.docs.map(doc => ({
-            id: doc.id,
             ...doc.data(),
+            id: doc.id,
             createdAt: doc.data().createdAt?.toDate?.()?.toISOString() ?? null,
         }));
 

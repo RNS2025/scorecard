@@ -45,11 +45,9 @@ class AdminService {
         return response.data;
     }
 
-    static async getLeaderboard(period?: string): Promise<import("../utils/interfaces/Leaderboard.ts").LeaderboardEntry[]> {
+    static async getLeaderboard(): Promise<import("../utils/interfaces/Leaderboard.ts").LeaderboardEntry[]> {
         const headers = await getAuthHeader();
-        const params: Record<string, string> = {};
-        if (period) params.period = period;
-        const response = await api.get('/admin/leaderboard', { headers, params });
+        const response = await api.get('/admin/leaderboard', { headers });
         return response.data;
     }
 
