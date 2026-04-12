@@ -1,4 +1,4 @@
-import {Route, Routes} from "react-router-dom"
+import {createBrowserRouter, RouterProvider} from "react-router-dom"
 import LandingPage from "./features/LandingPage.tsx";
 import CreateGamePage from "./features/createGame/CreateGamePage.tsx";
 import ScorecardPage from "./features/scorecard/ScorecardPage.tsx";
@@ -10,30 +10,20 @@ import LoginPage from "./features/admin/LoginPage.tsx";
 import DashboardPage from "./features/admin/dashboard/DashboardPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
+const router = createBrowserRouter([
+    { path: "/", element: <LandingPage /> },
+    { path: "/:courseId/creategame", element: <CreateGamePage /> },
+    { path: "/:courseId/game/:gameId", element: <ScorecardPage /> },
+    { path: "/:courseId/game/:gameId/score-only", element: <SharedScorePage /> },
+    { path: "/:courseId/leaderboard", element: <LeaderboardPage /> },
+    { path: "/dashboard", element: <DashboardList /> },
+    { path: "/:courseId/dashboard", element: <TvDashboardPage /> },
+    { path: "/admin", element: <LoginPage /> },
+    { path: "/admin/dashboard", element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
+]);
 
 function App() {
-
-  return (
-      <Routes>
-          <Route index path="/" element={<LandingPage />} />
-
-          <Route path="/:courseId/creategame" element={<CreateGamePage />} />
-          <Route path="/:courseId/game/:gameId" element={<ScorecardPage />} />
-          <Route path="/:courseId/game/:gameId/score-only" element={<SharedScorePage />} />
-          <Route path="/:courseId/leaderboard" element={<LeaderboardPage />} />
-
-
-          <Route path="/dashboard" element={<DashboardList />} />
-          <Route path="/:courseId/dashboard" element={<TvDashboardPage />} />
-
-          <Route path="/admin" element={<LoginPage />} />
-          <Route path="/admin/dashboard" element={
-              <ProtectedRoute>
-                  <DashboardPage />
-              </ProtectedRoute>
-          } />
-      </Routes>
-  )
+  return <RouterProvider router={router} />;
 }
 
 export default App

@@ -112,7 +112,7 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
 
                 <h2 className="text-lg font-bold mb-1">Bekræft dine oplysninger</h2>
                 <p className="text-sm text-gray-500 mb-5">
-                    Udfyld gerne dit fulde navn så vi kan skelne dig fra andre spillere
+                    Udfyld gerne dit fulde navn email så vi kan skelne dig fra andre spillere
                 </p>
 
                 <div className="flex flex-col gap-6">
@@ -214,13 +214,27 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
                             </div>
                         </div>
                     ))}
+
+                {/* Del kamp */}
+                {allHolesPlayed && (
+                    <button
+                        onClick={() => {
+                            const url = `${window.location.origin}/${course.id}/game/${game.id}/score-only`;
+                            navigator.clipboard.writeText(url).then();
+                            alert("Link kopieret!");
+                        }}
+                        className="w-full shadow-xl text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
+                    >
+                        🔗 Del kamp
+                    </button>
+                )}
             </div>
 
             {/* Publicerings-sektion */}
             {allHolesPlayed && (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 text-center">
                     <p className="text-sm text-green-800 font-medium mb-3">
-                        Tilfreds med runden? Publicér din score og se hvor du rangerer for denne bane!
+                        Tilfreds med runden? Publicér din score til ranglisten!
                     </p>
                     <p className="text-xs text-green-600 mb-4">
                         Marker spillere med checkboxen ved siden af scoren
@@ -281,20 +295,6 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
                     </tbody>
                 </table>
             </div>
-
-            {/* Del kamp */}
-            {allHolesPlayed && (
-                <button
-                    onClick={() => {
-                        const url = `${window.location.origin}/${course.id}/game/${game.id}/score-only`;
-                        navigator.clipboard.writeText(url).then();
-                        alert("Link kopieret!");
-                    }}
-                    className="w-full mt-4 shadow-lg text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50"
-                >
-                    🔗 Del kamp
-                </button>
-            )}
         </div>
     );
 };

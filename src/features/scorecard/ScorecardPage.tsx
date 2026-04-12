@@ -1,7 +1,7 @@
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams, useBlocker} from "react-router-dom";
 import { useGame, useUpdateGame } from "../../hooks/useGame.ts";
 import { useCourse } from "../../hooks/useCourses.ts";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import type { Player } from "../../utils/interfaces/Game.ts";
 import type { Game } from "../../utils/interfaces/Game.ts";
 import ScoreTab from "./ScoreTab.tsx";
@@ -21,7 +21,40 @@ const ScorecardPage = () => {
     const [activeTab, setActiveTab] = useState<"score" | "oversigt">("score");
     const [currentHole, setCurrentHole] = useState<number>(0);
     const [localPlayers, setLocalPlayers] = useState<Player[] | null>(null);
+    const [allowNavigation, setAllowNavigation] = useState(false);
 
+    // Block in-app navigation (browser back, swipe-back) with confirmation
+    const blocker = useBlocker(!allowNavigation);
+
+    useEffect(() => {
+        if (blocker.state === "blocked") {
+            const leave = window.confirm(
+                "Er du sikker på at du vil forlade scorecortet? Dine ugemte ændringer kan gå tabt."
+            );
+            if (leave) {
+                blocker.proceed();
+            } else {
+                blocker.reset();
+            }
+        }
+    }, [blocker.state]);
+
+    // Also block full page unload (refresh, close tab, navigate away from site)
+    useEffect(() => {
+        if (allowNavigation) return;
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [allowNavigation]);
+
+    // Navigate away once allowNavigation is set (after confirming "Afslut runde")
+    useEffect(() => {
+        if (allowNavigation) {
+            navigate(`/${courseId}/creategame`);
+        }
+    }, [allowNavigation, navigate, courseId]);
 
     const saveToServer = (players: Player[]) => {
         if (!game) return;
@@ -106,7 +139,7 @@ const ScorecardPage = () => {
                 <span onClick={() => {
                     const newRound = confirm("Er du sikker på at du vil afslutte runden? Du vil blive ført tilbage spiloprettelse.");
                     if (newRound) {
-                        navigate(`/${courseId}/creategame`)
+                        setAllowNavigation(true);
                     }
                 }}>Afslut runde</span>
             </div>
