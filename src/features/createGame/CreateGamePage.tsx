@@ -197,11 +197,14 @@ const CreateGamePage = () => {
                 </button>
 
                 <button
+                    disabled={true}
                     onClick={() => setLogInModalOpen((prev) => !prev)}
-                    className={`w-full shadow-xl ${startMatchEnabled ? 'bg-green-500 text-white' : ''} border border-gray-200 text-green-700 font-bold rounded-lg py-3 px-4 transition hover:bg-green-50`}
+                    className={`w-full shadow-xl border border-gray-200 text-green-700 
+                    font-bold rounded-lg py-3 px-4 transition hover:bg-green-50 opacity-20`}
                 >
                     👤
                     <p>Log ind</p>
+                    <p className="text-sm">Kommer snart</p>
                 </button>
 
                 <button

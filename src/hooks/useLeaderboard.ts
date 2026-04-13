@@ -14,7 +14,7 @@ export const usePublishScores = () => {
     return useMutation({
         mutationFn: LeaderboardService.publishScores,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+            queryClient.invalidateQueries({queryKey: ['leaderboard']}).then();
         },
     });
 };

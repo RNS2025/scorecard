@@ -161,7 +161,7 @@ const LeaderboardPage = () => {
 
                         {/* Full list */}
                         <div className="flex flex-col gap-2">
-                            {entries.map((entry, i) => (
+                            {entries.slice(0, 10).map((entry, i) => (
                                 <div
                                      key={`${entry.id}-${i}`}
                                     className={`flex items-center gap-3 bg-white rounded-xl p-4 transition`}
