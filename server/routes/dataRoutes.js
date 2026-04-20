@@ -4,6 +4,7 @@ const { getCourses, getCourseById, createCourse, addHoles } = require('../contro
 const { getGameById, createGame, updateGame } = require('../controllers/gameController');
 const { publishScores, getLeaderboard } = require('../controllers/leaderboardController');
 const { getProfile, getAdminLeaderboard, getMarketingEmails, getAdminStats } = require('../controllers/adminController');
+const { getAllUsers } = require('../controllers/userController');
 const { verifyAdmin } = require('../middleware/authMiddleware');
 
 // Course Routes
@@ -26,5 +27,8 @@ router.get('/admin/profile', verifyAdmin, getProfile);
 router.get('/admin/leaderboard', verifyAdmin, getAdminLeaderboard);
 router.get('/admin/marketing-emails', verifyAdmin, getMarketingEmails);
 router.get('/admin/stats', verifyAdmin, getAdminStats);
+
+// User Routes
+router.get('/users', getAllUsers);
 
 module.exports = router;

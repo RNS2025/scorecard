@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { da } from "date-fns/locale";
 import { TrophyIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
 import scorecard_logo from "../../assets/scorecard logo.png";
+import rns_green from "../../assets/rns_green.png";
 import { getTotalPar, getShotLabel } from "../../utils/parUtils.ts";
 
 type Period = "all" | "month" | "week";
@@ -45,27 +46,30 @@ const LeaderboardPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div id="MainContent" className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-linear-to-r from-green-600 to-green-800 text-white px-5 pt-5 pb-6">
-                <div className="flex items-center gap-3 mb-4">
-                    <button onClick={() => navigate(`/${courseId}/creategame`)} className="p-1 hover:bg-white/10 rounded-lg transition">
-                        <ArrowLeftIcon className="w-5 h-5" />
+            <div className="bg-linear-to-r from-green-600 to-green-800 text-white px-5 py-3">
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate(`/${courseId}/creategame`)}
+                            className="p-1 hover:bg-white/10 rounded-lg transition">
+                        <ArrowLeftIcon className="w-5 h-5"/>
                     </button>
-                    <img src={scorecard_logo} alt="Scorecard" className="w-10" />
-                </div>
 
-                <div className="flex items-center gap-3 mb-1">
-                    <TrophyIcon className="w-7 h-7 text-yellow-300" />
-                    <h1 className="text-2xl font-bold">Rangliste</h1>
-                </div>
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            <TrophyIcon className="w-7 h-7 text-yellow-300"/>
+                            <h1 className="text-2xl font-bold">Rangliste</h1>
+                        </div>
 
-                {course && (
-                    <p className="text-green-200 text-sm ml-10">
-                        {course.name} · {course.numberOfHoles} huller
-                        {getTotalPar(course) !== undefined && ` · Par ${getTotalPar(course)}`}
-                    </p>
-                )}
+
+                        {course && (
+                            <p className="text-green-200 text-sm">
+                                {course.name} · {course.numberOfHoles} huller
+                                {getTotalPar(course) !== undefined && ` · Par ${getTotalPar(course)}`}
+                            </p>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Period tabs */}
@@ -77,8 +81,8 @@ const LeaderboardPage = () => {
                             onClick={() => setPeriod(p)}
                             className={`flex-1 py-3 text-sm font-semibold transition
                                 ${period === p
-                                    ? "border-b-2 border-green-600 text-green-700"
-                                    : "text-gray-400 hover:text-gray-600"}`}
+                                ? "border-b-2 border-green-600 text-green-700"
+                                : "text-gray-400 hover:text-gray-600"}`}
                         >
                             {periodLabels[p]}
                         </button>
@@ -94,7 +98,7 @@ const LeaderboardPage = () => {
 
                 {!isLoading && (!entries || entries.length === 0) && (
                     <div className="text-center mt-16">
-                        <TrophyIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <TrophyIcon className="w-12 h-12 text-gray-300 mx-auto mb-3"/>
                         <p className="text-gray-500 font-medium">Ingen resultater endnu</p>
                         <p className="text-gray-400 text-sm mt-1">
                             {period === "all"
@@ -111,7 +115,8 @@ const LeaderboardPage = () => {
                             <div className="flex items-end justify-center gap-3 mb-8 mt-2">
                                 {/* 2. plads */}
                                 <div className="flex flex-col items-center">
-                                    <div className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center text-white text-xl font-bold shadow-md">
+                                    <div
+                                        className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center text-white text-xl font-bold shadow-md">
                                         2
                                     </div>
                                     <p className="text-sm font-semibold mt-2 text-center leading-tight max-w-20 truncate">
@@ -127,7 +132,8 @@ const LeaderboardPage = () => {
 
                                 {/* 1. plads */}
                                 <div className="flex flex-col items-center -mt-4">
-                                    <div className="w-18 h-18 rounded-full bg-yellow-400 flex items-center justify-center text-white text-2xl font-bold shadow-lg ring-4 ring-yellow-200">
+                                    <div
+                                        className="w-18 h-18 rounded-full bg-yellow-400 flex items-center justify-center text-white text-2xl font-bold shadow-lg ring-4 ring-yellow-200">
                                         👑
                                     </div>
                                     <p className="text-sm font-bold mt-2 text-center leading-tight max-w-22.5 truncate">
@@ -143,7 +149,8 @@ const LeaderboardPage = () => {
 
                                 {/* 3. plads */}
                                 <div className="flex flex-col items-center">
-                                    <div className="w-14 h-14 rounded-full bg-amber-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
+                                    <div
+                                        className="w-14 h-14 rounded-full bg-amber-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
                                         3
                                     </div>
                                     <p className="text-sm font-semibold mt-2 text-center leading-tight max-w-20 truncate">
@@ -163,7 +170,7 @@ const LeaderboardPage = () => {
                         <div className="flex flex-col gap-2">
                             {entries.slice(0, 10).map((entry, i) => (
                                 <div
-                                     key={`${entry.id}-${i}`}
+                                    key={`${entry.id}-${i}`}
                                     className={`flex items-center gap-3 bg-white rounded-xl p-4 transition`}
                                 >
                                     {/* Position */}
@@ -177,7 +184,7 @@ const LeaderboardPage = () => {
                                         <p className="font-semibold truncate">{entry.playerName}</p>
                                         <p className="text-xs text-gray-400">
                                             {entry.createdAt
-                                                ? format(new Date(entry.createdAt), "d. MMM yyyy", { locale: da })
+                                                ? format(new Date(entry.createdAt), "d. MMM yyyy", {locale: da})
                                                 : "—"}
                                         </p>
                                     </div>
@@ -223,6 +230,37 @@ const LeaderboardPage = () => {
                     Spil en ny runde
                 </button>
             </div>
+
+
+            <footer className="bg-gray-100">
+                <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:pt-24">
+
+                    <div className="lg:flex lg:justify-center lg:items-center">
+                        <div className="flex flex-col items-center gap-4 text-center lg:flex-row lg:gap-8 lg:text-left">
+                            <div className="flex justify-center">
+                                <img src={scorecard_logo} alt="Scorecard logo" className="size-28"/>
+                                <img src={rns_green} alt="RNS Apps logo" className="h-28"/>
+                            </div>
+
+                            <p className="mx-auto mt-6 max-w-md text-center leading-relaxed text-gray-500 lg:text-left">
+                                scorecard.dk er et digitalt scorekort til nichegolf-sportsgrene. Udviklet af RNS Apps.
+                                Gør oplevelsen bedre for dine spillere – læs mere og kom i gang på scorecard.dk.
+                            </p>
+
+                            <a className="inline-block rounded-full bg-green-600 p-2 text-white shadow-sm transition hover:bg-teal-500 sm:p-3 lg:p-4"
+                               href="#MainContent">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 20 20"
+                                     fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                          d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+                                          clip-rule="evenodd"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 };

@@ -13,13 +13,19 @@ import { useCourseImage } from "../../hooks/useCourseImage.ts";
 import { getTotalPar } from "../../utils/parUtils.ts";
 import DynamicModal from "./DynamicModal.tsx";
 import LoginModal from "./LoginModal.tsx";
+import { useUserProfile } from "../../hooks/useUserProfile.ts";
+import SearchPlayerModal from "./SearchPlayerModal.tsx";
+import { useUsers } from "../../hooks/useUsers.ts";
 
 const CreateGamePage = () => {
     const { courseId } = useParams();
     const navigate = useNavigate();
+    const { profile } = useUserProfile();
+    const { data: playersData, isLoading: playersLoading } = useUsers();
+    const players = playersData ?? [];
     const { data: course, isLoading, isError } = useCourse(String(courseId));
     const { mutate: createGame } = useCreateGame();
-    const { data: logoUrl } = useCourseImage(String(courseId), "logo");
+    const { data: logoUrl, isLoading: imageLoading } = useCourseImage(String(courseId), "logo");
     const [logoShape, setLogoShape] = useState<"landscape" | "square" | null>(null);
 
     useEffect(() => {
@@ -40,16 +46,32 @@ const CreateGamePage = () => {
     const [startMatchEnabled, setStartMatchEnabled] = useState(false);
     const [playerCount, setPlayerCount] = useState<number>(0);
     const [playerNames, setPlayerNames] = useState<string[]>([]);
+    const [playerEmails, setPlayerEmails] = useState<(string | undefined)[]>([]);
+    const [searchPlayerModalOpen, setSearchPlayerModalOpen] = useState(false);
+    const [activePlayerIndex, setActivePlayerIndex] = useState<number | null>(null);
+
+    const toggleMeButton = !!(profile && playerNames[0] === profile.name);
+
 
     const handlePlayerCountChange = (count: number) => {
         setPlayerCount(count);
         setPlayerNames((prev) => {
             const updated = [...prev];
-            if (count > updated.length) {
-                return [...updated, ...Array(count - updated.length).fill("")];
-            }
-            return updated.slice(0, count);
+            const filled = count > updated.length
+                ? [...updated, ...Array(count - updated.length).fill("")]
+                : updated.slice(0, count);
+            if (profile) filled[0] = profile.name;
+            return filled;
         });
+        setPlayerEmails((prev) => {
+            const updated = [...prev];
+            const filled = count > updated.length
+                ? [...updated, ...Array(count - updated.length).fill(undefined)]
+                : updated.slice(0, count);
+            if (profile) filled[0] = profile.email;
+            return filled;
+        });
+        setActivePlayerIndex(null);
     };
 
     const handlePlayerNameChange = (index: number, name: string) => {
@@ -71,8 +93,9 @@ const CreateGamePage = () => {
             name: gameName.trim() || defaultName,
             format: format as "slagspil" | "hulspil",
             numberOfPlayers: playerCount,
-            players: playerNames.map((name) => ({
+            players: playerNames.map((name, i) => ({
                 name: name.trim(),
+                email: playerEmails[i],
                 scores: Array(course.numberOfHoles).fill(null),
             })),
             createdAt: new Date().toISOString(),
@@ -85,9 +108,29 @@ const CreateGamePage = () => {
         });
     }
 
+    const handleSelectPlayer = (player: import("../../utils/interfaces/Game.ts").Player) => {
+        if (activePlayerIndex === null) return;
+
+        setPlayerNames((prev) => {
+            const updated = [...prev];
+            updated[activePlayerIndex] = player.name;
+            return updated;
+        });
+
+        setPlayerEmails((prev) => {
+            const updated = [...prev];
+            updated[activePlayerIndex] = player.email;
+            return updated;
+        });
+
+        setActivePlayerIndex(null);
+        setSearchPlayerModalOpen(false);
+    };
 
 
-    if (isLoading) return <p className="text-center mt-20 animate-pulse">Henter information...</p>;
+
+    if (isLoading || imageLoading) return <p className="text-center mt-20 animate-pulse">Henter information...</p>;
+    if (playersLoading) return <p className="text-center mt-20 animate-pulse">Henter spillere...</p>;
     if (isError || !course) return <p className="text-center mt-20 text-red-500">Der er sket en fejl. Prøv at genindlæs siden</p>;
 
     return (
@@ -197,14 +240,12 @@ const CreateGamePage = () => {
                 </button>
 
                 <button
-                    disabled={true}
                     onClick={() => setLogInModalOpen((prev) => !prev)}
                     className={`w-full shadow-xl border border-gray-200 text-green-700 
-                    font-bold rounded-lg py-3 px-4 transition hover:bg-green-50 opacity-20`}
+                    font-bold rounded-lg py-3 px-4 transition hover:bg-green-50 ${profile ? 'bg-green-500 text-white' : ''}`}
                 >
                     👤
-                    <p>Log ind</p>
-                    <p className="text-sm">Kommer snart</p>
+                    <p>{profile ? `Hej ${profile.name}!` : "Log ind"}</p>
                 </button>
 
                 <button
@@ -306,17 +347,66 @@ const CreateGamePage = () => {
                         <div className="flex flex-col gap-3">
                             <label className="text-sm font-medium">Spillernavne</label>
                             {playerNames.map((name, index) => (
-                                <input
-                                    key={index}
+                                    <div key={index} className="grid grid-cols-[80%_20%] items-center gap-2">
+                                    <input
                                     type="text"
                                     placeholder={`Spiller ${index + 1}`}
                                     value={name}
                                     onChange={(e) => handlePlayerNameChange(index, e.target.value)}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                />
-                            ))}
-                        </div>
-                    )}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2
+                                    focus:ring-green-500"/>
+
+
+                                        {profile && index === 0 && (
+                                            <button
+                                                onClick={() => {
+                                                    const next = !toggleMeButton;
+                                                    setPlayerNames((current) => {
+                                                        const updated = [...current];
+                                                        updated[0] = next ? profile.name : "";
+                                                        return updated;
+                                                    });
+                                                    setPlayerEmails((current) => {
+                                                        const updated = [...current];
+                                                        updated[0] = next ? profile.email : undefined;
+                                                        return updated;
+                                                    });
+                                                }}
+                                                type="button"
+                                                className={`shadow-xl border border-gray-300 rounded-lg p-3
+                                                ${toggleMeButton ? "bg-green-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}
+                                                transition duration-500`}
+                                            >
+                                                Mig
+                                            </button>
+                                        )}
+
+                                        {index > 0 && (
+                                            <button
+                                                onClick={() => {
+                                                    setActivePlayerIndex(index);
+                                                    setSearchPlayerModalOpen(true);
+                                                }}
+                                                type="button"
+                                                className="shadow-xl border border-gray-300 rounded-lg p-3 bg-gray-100 text-gray-600 hover:bg-gray-200 transition duration-500"
+                                            >
+                                                👤
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                    <SearchPlayerModal
+                        open={searchPlayerModalOpen}
+                        onClose={() => {
+                            setSearchPlayerModalOpen(false);
+                            setActivePlayerIndex(null);
+                        }}
+                        players={players}
+                        onSelect={handleSelectPlayer}
+                    />
 
                     <div className="flex flex-col gap-2">
 

@@ -20,9 +20,10 @@ interface OverviewTabProps {
     getPlayerTotalDiff: (player: Player) => string;
     getPlayerDiffForHole: (score: number | null, par: number | undefined) => string | null;
     getDiffColor: (diff: string | null) => string;
+    setAllowNavigation: (value: boolean) => void;
 }
 
-const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPlayerDiffForHole, getDiffColor }: OverviewTabProps) => {
+const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPlayerDiffForHole, getDiffColor, setAllowNavigation }: OverviewTabProps) => {
     const navigate = useNavigate();
     const { mutate: publishScores, isPending: isPublishing } = usePublishScores();
     const [publishPlayers, setPublishPlayers] = useState<boolean[]>(game.players.map(() => false));
@@ -46,7 +47,7 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
         const selectedPlayers = game.players.filter((_, i) => publishPlayers[i]);
         setPublishForms(selectedPlayers.map((p) => ({
             name: p.name,
-            email: "",
+            email: p.email ?? "",
             marketingConsent: false,
         })));
         setStep("publish");
@@ -91,7 +92,10 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
         });
 
         publishScores(entries, {
-            onSuccess: () => navigate(`/${course.id}/leaderboard`),
+            onSuccess: () => {
+                setAllowNavigation(true);
+                navigate(`/${course.id}/leaderboard`);
+            },
             onError: (e) => {
                 alert("Noget gik galt – prøv igen.")
                 console.log("Publish error:", e);

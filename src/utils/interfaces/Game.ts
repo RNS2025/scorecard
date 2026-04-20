@@ -10,6 +10,7 @@ export interface Game {
 }
 
 export interface Player {
+    id?: string;
     name: string;
     email?: string;
     scores: (number | null)[];

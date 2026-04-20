@@ -37,7 +37,7 @@ const ScorecardPage = () => {
                 blocker.reset();
             }
         }
-    }, [blocker.state]);
+    }, [blocker, blocker.state]);
 
     // Also block full page unload (refresh, close tab, navigate away from site)
     useEffect(() => {
@@ -187,6 +187,7 @@ const ScorecardPage = () => {
                     getPlayerTotalDiff={getPlayerTotalDiff}
                     getPlayerDiffForHole={getPlayerDiffForHole}
                     getDiffColor={getDiffColor}
+                    setAllowNavigation={setAllowNavigation}
                 />
             )}
 
