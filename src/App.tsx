@@ -1,5 +1,6 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom"
 import LandingPage from "./features/LandingPage.tsx";
+import HomePage from "./features/HomePage.tsx";
 import CreateGamePage from "./features/createGame/CreateGamePage.tsx";
 import ScorecardPage from "./features/scorecard/ScorecardPage.tsx";
 import SharedScorePage from "./features/scorecard/SharedScorePage.tsx";
@@ -11,7 +12,8 @@ import DashboardPage from "./features/admin/dashboard/DashboardPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 const router = createBrowserRouter([
-    { path: "/", element: <LandingPage /> },
+    { path: "/", element: <HomePage /> },
+    { path: "/course", element: <LandingPage /> },
     { path: "/:courseId/creategame", element: <CreateGamePage /> },
     { path: "/:courseId/game/:gameId", element: <ScorecardPage /> },
     { path: "/:courseId/game/:gameId/score-only", element: <SharedScorePage /> },
