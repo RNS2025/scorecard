@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import scorecard_logo from "../assets/scorecard logo.png";
 import rns_logo from "../assets/rns_green.png";
 import { ref, listAll, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase/firebase.ts";
 import { useQuery } from "@tanstack/react-query";
 
-// Hent alle baner der har et logo i Storage
 const fetchCustomerLogos = async (): Promise<{ courseId: string; logoUrl: string }[]> => {
     const rootRef = ref(storage);
     const root = await listAll(rootRef);
@@ -21,8 +20,42 @@ const fetchCustomerLogos = async (): Promise<{ courseId: string; logoUrl: string
     return results.filter(Boolean) as { courseId: string; logoUrl: string }[];
 };
 
-const ReferencesSection = ({ title }: { title: string }) => {
-    const { data: customers = [] } = useQuery({
+const useFadeIn = (threshold = 0.15) => {
+    const ref = useRef<HTMLDivElement>(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+            { threshold }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [threshold]);
+
+    return { ref, visible };
+};
+
+const FadeIn = ({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => {
+    const { ref, visible } = useFadeIn();
+    return (
+        <div
+            ref={ref}
+            className={className}
+            style={{
+                opacity: visible ? 1 : 0,
+                transform: visible ? "translateY(0)" : "translateY(24px)",
+                transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
+            }}
+        >
+            {children}
+        </div>
+    );
+};
+
+const ReferencesSection = ({ title }: { title: string }) => {    const { data: customers = [] } = useQuery({
         queryKey: ["customerLogos"],
         queryFn: fetchCustomerLogos,
         staleTime: Infinity,
@@ -103,7 +136,7 @@ const content = {
         pricing: {
             title: "Én pris. Alt inkluderet.",
             subtitle: "Ingen skjulte gebyrer. Ingen moduler at betale for. Bare ét simpelt abonnement.",
-            yearlyNote: "Faktureres årligt",
+            yearlyNote: "Eks. moms | Faktureres årligt",
             everythingTitle: "Alt hvad du får:",
             customNote: "🎨 Vi tilpasser applikationen til din bane – dit logo, dine farver, dine regler. Du kommer med input, vi sørger for resten.",
             plans: [
@@ -121,7 +154,6 @@ const content = {
                         "Realtidsopdatering af scores",
                         "Opsætning og onboarding",
                         "Løbende support",
-                        "Input til design og layout",
                     ],
                     cta: "Kontakt os og kom i gang",
                     highlight: true,
@@ -137,7 +169,7 @@ const content = {
             email: "luu@rnsapps.dk",
             cta: "Send en mail",
         },
-        footer: "© 2025 Scorecard. Alle rettigheder forbeholdes.",
+        footer: "© 2026 Scorecard. Alle rettigheder forbeholdes.",
     },
     en: {
         nav: { features: "Features", pricing: "Pricing", contact: "Contact", lang: "Dansk" },
@@ -209,7 +241,6 @@ const content = {
                         "Real-time score updates",
                         "Setup and onboarding",
                         "Ongoing support",
-                        "Input on design and layout",
                     ],
                     cta: "Contact us to get started",
                     highlight: true,
@@ -225,7 +256,7 @@ const content = {
         references: {
             title: "Already trusted by",
         },
-        footer: "© 2025 Scorecard. All rights reserved.",
+        footer: "© 2026 Scorecard. All rights reserved.",
     },
 };
 
@@ -286,6 +317,7 @@ const HomePage = () => {
             </section>
 
             {/* PAIN POINTS */}
+            <FadeIn>
             <section className="px-6 py-10 bg-gray-950 text-white">
                 <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {t.painPoints.map((point, i) => (
@@ -296,34 +328,42 @@ const HomePage = () => {
                     ))}
                 </div>
             </section>
+            </FadeIn>
 
             {/* FEATURES */}
             <section id="features" className="px-6 py-20 max-w-4xl mx-auto">
+                <FadeIn>
                 <div className="text-center mb-12">
                     <h2 className="text-3xl sm:text-4xl font-extrabold mb-3">{t.features.title}</h2>
                     <p className="text-gray-500 text-lg">{t.features.subtitle}</p>
                 </div>
+                </FadeIn>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {t.features.items.map((f, i) => (
-                        <div key={i} className="group relative bg-white border border-gray-100 rounded-3xl p-7 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+                        <FadeIn key={i} delay={i * 80}>
+                        <div className="group relative h-full bg-white border border-gray-100 rounded-3xl p-7 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
                             <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-2xl mb-4 group-hover:bg-green-100 transition">
                                 {f.icon}
                             </div>
                             <h3 className="font-bold text-xl mb-2">{f.title}</h3>
                             <p className="text-gray-500 leading-relaxed">{f.desc}</p>
                         </div>
+                        </FadeIn>
                     ))}
                 </div>
             </section>
 
             {/* HOW IT WORKS */}
             <section className="bg-linear-to-br from-green-50 to-emerald-50 px-6 py-20">
+                <FadeIn>
                 <div className="max-w-3xl mx-auto text-center mb-12">
                     <h2 className="text-3xl sm:text-4xl font-extrabold">{t.howItWorks.title}</h2>
                 </div>
+                </FadeIn>
                 <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {t.howItWorks.steps.map((s, i) => (
-                        <div key={i} className="bg-white rounded-3xl p-6 shadow-sm flex gap-4 border border-green-100">
+                        <FadeIn key={i} delay={i * 80}>
+                        <div className="bg-white rounded-3xl p-6 shadow-sm flex gap-4 border border-green-100">
                             <span className="w-11 h-11 bg-linear-to-br from-green-600 to-emerald-500 text-white rounded-2xl flex items-center justify-center font-extrabold text-lg shrink-0 shadow-md">
                                 {s.num}
                             </span>
@@ -332,18 +372,22 @@ const HomePage = () => {
                                 <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
                             </div>
                         </div>
+                        </FadeIn>
                     ))}
                 </div>
             </section>
 
             {/* PRICING */}
             <section id="pricing" className="px-6 py-20 max-w-2xl mx-auto">
+                <FadeIn>
                 <div className="text-center mb-12">
                     <h2 className="text-3xl sm:text-4xl font-extrabold mb-3">{t.pricing.title}</h2>
                     <p className="text-gray-500 text-lg">{t.pricing.subtitle}</p>
                 </div>
+                </FadeIn>
                 {t.pricing.plans.map((plan, i) => (
-                    <div key={i} className="relative bg-linear-to-br from-green-700 to-emerald-600 text-white rounded-3xl p-8 shadow-2xl overflow-hidden">
+                    <FadeIn key={i}>
+                    <div className="relative bg-linear-to-br from-green-700 to-emerald-600 text-white rounded-3xl p-8 shadow-2xl overflow-hidden">
                         {/* decorative circle */}
                         <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full pointer-events-none" />
 
@@ -375,13 +419,8 @@ const HomePage = () => {
                                 </li>
                             ))}
                         </ul>
-
-                        <div className="h-px bg-white/15 mb-6" />
-
-                        <div className="bg-white/10 border border-white/15 rounded-2xl px-5 py-4 text-sm text-green-100 leading-relaxed">
-                            {t.pricing.customNote}
-                        </div>
                     </div>
+                    </FadeIn>
                 ))}
             </section>
 
@@ -389,6 +428,7 @@ const HomePage = () => {
             <ReferencesSection title={t.references.title} />
 
             {/* CONTACT */}
+            <FadeIn>
             <section id="contact" className="relative bg-gray-950 text-white px-6 py-20 text-center overflow-hidden">
                 <div className="absolute inset-0 bg-linear-to-br from-green-900/40 to-transparent pointer-events-none" />
                 <div className="relative z-10">
@@ -404,10 +444,12 @@ const HomePage = () => {
                 </div>
 
                 <div className="flex max-sm:flex-col justify-center items-center mt-10">
-                    <img src={rns_logo} alt="Scorecard" className="h-52 object-contain" />
-                    <img src={scorecard_logo} alt="Scorecard" className="h-52 object-contain" />
+                    <img src={rns_logo} onClick={() => window.open("https://www.rns-apps.dk", '_blank')?.focus()} alt="Scorecard"
+                         className="h-52 object-contain hover:scale-110 transition-transform cursor-pointer" />
+                    <img src={scorecard_logo} alt="Scorecard" className="h-52 object-contain hover:scale-110 transition-transform" />
                 </div>
             </section>
+            </FadeIn>
 
             {/* FOOTER */}
             <footer className="text-center text-xs text-gray-400 py-6 bg-gray-950 border-t border-gray-800">
