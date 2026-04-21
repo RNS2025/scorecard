@@ -37,7 +37,7 @@ const LandingPage = () => {
                 )}
 
                 {selectedCourseId !== "" && selectedCourseId !== null && (
-                    <button onClick={() => navigate(`${selectedCourseId}/creategame`)} className="w-full bg-linear-to-r from-green-500 to-green-800 text-white rounded py-2 px-4 transition">
+                    <button onClick={() => navigate(`/${selectedCourseId}/creategame`)} className="w-full bg-linear-to-r from-green-500 to-green-800 text-white rounded py-2 px-4 transition">
                         Fortsæt
                     </button>
                 )}
