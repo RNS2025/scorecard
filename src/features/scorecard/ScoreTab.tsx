@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import type { Game } from "../../utils/interfaces/Game.ts";
 import type { Course } from "../../utils/interfaces/Course.ts";
@@ -7,6 +7,7 @@ import { getScoreOptions } from "./scoreUtils.ts";
 import RulesModal from "../createGame/RulesModal.tsx";
 import HoleDescriptionModal from "./HoleDescriptionModal.tsx";
 import { getHolePar } from "../../utils/parUtils.ts";
+import ShareModal from "./ShareModal.tsx";
 
 interface ScoreTabProps {
     game: Game;
@@ -27,6 +28,19 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
     const scoreOptions = getScoreOptions(course.sport ?? "", holePar ?? 0);
     const [rulesModalOpen, setRulesModalOpen] = useState(false);
     const [holeDescModalOpen, setHoleDescModalOpen] = useState(false);
+    const [shareModalOpen, setShareModalOpen] = useState(false);
+    const holeScrollRef = useRef<HTMLDivElement>(null);
+    const holeButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+    useEffect(() => {
+        holeButtonRefs.current[currentHole]?.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center",
+        });
+    }, [currentHole]);
+
+    const gameUrl = `${window.location.origin}/${courseId}/game/${game.id}`;
 
 
     return (
@@ -46,12 +60,13 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                 />
             )}
             {/* Hul-vælger */}
-            <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
+            <div ref={holeScrollRef} className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
                 {course.holes.map((h, i) => {
                     const allFilled = game.players.every((p) => p.scores[i] !== null);
                     return (
                         <button
                             key={h.number}
+                            ref={(el) => { holeButtonRefs.current[i] = el; }}
                             onClick={() => setCurrentHole(i)}
                             className={`shrink-0 w-10 h-10 rounded-full text-sm font-bold transition
                                 ${currentHole === i
@@ -87,7 +102,7 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
             </div>
 
             {/* Score-input per spiller */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 max-h-[calc(100vh-25rem)] overflow-y-auto">
                 {game.players.map((player, playerIndex) => {
                     const score = player.scores[currentHole];
                     return (
@@ -143,12 +158,23 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                 </button>
             </div>
 
-            <div className="py-8 grid grid-cols-2 gap-2 text-sm">
+            <div className="py-8 grid grid-cols-3 gap-2 text-sm">
+                <button
+                    onClick={() => setShareModalOpen(true)}
+                    className="w-full shadow-md text-green-700 font-bold rounded-lg py-3 px-1 transition hover:bg-green-50"
+                >
+                    📲
+                    <p>Tilslut kamp</p>
+                </button>
+
+                <ShareModal open={shareModalOpen} onClose={() => setShareModalOpen(false)} gameUrl={gameUrl} />
+
                     <button
                         onClick={() => setHoleDescModalOpen(true)}
                         className="w-full shadow-md text-green-700 font-bold rounded-lg py-3 px-1 transition hover:bg-green-50"
                     >
-                        ⛳ Banebeskrivelse
+                        ⛳
+                        <p>Baneinfo</p>
                     </button>
                     <HoleDescriptionModal
                         open={holeDescModalOpen}
@@ -161,7 +187,8 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                     onClick={() => setRulesModalOpen(true)}
                     className="w-full shadow-md text-green-700 font-bold rounded-lg py-3 px-1 transition hover:bg-green-50"
                 >
-                    📋 Læs regler
+                    📋
+                    <p>Læs regler</p>
                 </button>
                 <RulesModal open={rulesModalOpen} onClose={() => setRulesModalOpen(false)} rules={course.rules ?? []} />
             </div>
