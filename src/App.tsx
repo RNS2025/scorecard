@@ -1,5 +1,5 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom"
-import LandingPage from "./features/LandingPage.tsx";
+import SelectCoursesPage from "./features/SelectCoursesPage.tsx";
 import HomePage from "./features/HomePage.tsx";
 import CreateGamePage from "./features/createGame/CreateGamePage.tsx";
 import ScorecardPage from "./features/scorecard/ScorecardPage.tsx";
@@ -10,10 +10,11 @@ import LeaderboardPage from "./features/leaderboard/LeaderboardPage.tsx";
 import LoginPage from "./features/admin/LoginPage.tsx";
 import DashboardPage from "./features/admin/dashboard/DashboardPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import NotFoundPage from "./features/NotFoundPage.tsx";
 
 const router = createBrowserRouter([
     { path: "/", element: <HomePage /> },
-    { path: "/course", element: <LandingPage /> },
+    { path: "/courses", element: <SelectCoursesPage /> },
     { path: "/:courseId/creategame", element: <CreateGamePage /> },
     { path: "/:courseId/game/:gameId", element: <ScorecardPage /> },
     { path: "/:courseId/game/:gameId/score-only", element: <SharedScorePage /> },
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
     { path: "/:courseId/dashboard", element: <TvDashboardPage /> },
     { path: "/admin", element: <LoginPage /> },
     { path: "/admin/dashboard", element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
+    { path: "*", element: <NotFoundPage /> },
 ]);
 
 function App() {

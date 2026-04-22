@@ -3,7 +3,7 @@ import {useCourses} from "../hooks/useCourses.ts";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 
-const LandingPage = () => {
+const SelectCoursesPage = () => {
     const { data: courses, isLoading, isError } = useCourses();
     const [selectedCourseId, setSelectedCourseId] = useState<string>("");
     const navigate = useNavigate();
@@ -47,4 +47,4 @@ const LandingPage = () => {
     );
 };
 
-export default LandingPage;
+export default SelectCoursesPage;

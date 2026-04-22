@@ -105,7 +105,7 @@ const content = {
                 {
                     icon: "📱",
                     title: "Mobilveneligt scorekort",
-                    desc: "Spillerne scanner en QR-kode og er i gang på sekunder.",
+                    desc: "Spillerne scanner en QR-kode og er i gang på sekunder. Flere spillere kan tilslutte sig spillet og indtaste resultater på samme tid",
                 },
                 {
                     icon: "🏆",
@@ -150,7 +150,7 @@ const content = {
                         "Automatisk rangliste",
                         "Dynamisk par – udregnes automatisk",
                         "Admin dashboard med overblik",
-                        "Live TV-visning til events",
+                        "Dashboard-side beregnet til TV",
                         "Realtidsopdatering af scores",
                         "Opsætning og onboarding",
                         "Løbende support",
@@ -237,7 +237,7 @@ const content = {
                         "Automatic leaderboard",
                         "Dynamic par – calculated automatically",
                         "Admin dashboard",
-                        "Live TV display for events",
+                        "Dashboard page optimized for TV",
                         "Real-time score updates",
                         "Setup and onboarding",
                         "Ongoing support",
