@@ -7,7 +7,6 @@ import { getScoreOptions } from "./scoreUtils.ts";
 import RulesModal from "../createGame/RulesModal.tsx";
 import HoleDescriptionModal from "./HoleDescriptionModal.tsx";
 import { getHolePar } from "../../utils/parUtils.ts";
-import ShareModal from "./ShareModal.tsx";
 
 interface ScoreTabProps {
     game: Game;
@@ -28,7 +27,6 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
     const scoreOptions = getScoreOptions(course.sport ?? "", holePar ?? 0);
     const [rulesModalOpen, setRulesModalOpen] = useState(false);
     const [holeDescModalOpen, setHoleDescModalOpen] = useState(false);
-    const [shareModalOpen, setShareModalOpen] = useState(false);
     const holeScrollRef = useRef<HTMLDivElement>(null);
     const holeButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -40,7 +38,6 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
         });
     }, [currentHole]);
 
-    const gameUrl = `${window.location.origin}/${courseId}/game/${game.id}`;
 
 
     return (
@@ -158,17 +155,7 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
                 </button>
             </div>
 
-            <div className="py-8 grid grid-cols-3 gap-2 text-sm">
-                <button
-                    onClick={() => setShareModalOpen(true)}
-                    className="w-full shadow-md text-green-700 font-bold rounded-lg py-3 px-1 transition hover:bg-green-50"
-                >
-                    📲
-                    <p>Tilslut kamp</p>
-                </button>
-
-                <ShareModal open={shareModalOpen} onClose={() => setShareModalOpen(false)} gameUrl={gameUrl} />
-
+            <div className="py-8 grid grid-cols-2 gap-2">
                     <button
                         onClick={() => setHoleDescModalOpen(true)}
                         className="w-full shadow-md text-green-700 font-bold rounded-lg py-3 px-1 transition hover:bg-green-50"

@@ -1,17 +1,18 @@
 import {useNavigate, useParams, useBlocker} from "react-router-dom";
-import { useGame, useUpdateGame } from "../../hooks/useGame.ts";
+import { useGameLive, useUpdateGame } from "../../hooks/useGame.ts";
 import { useCourse } from "../../hooks/useCourses.ts";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import type { Player } from "../../utils/interfaces/Game.ts";
 import type { Game } from "../../utils/interfaces/Game.ts";
 import ScoreTab from "./ScoreTab.tsx";
 import StandingsTab from "./StandingsTab.tsx";
 import { useCourseImage } from "../../hooks/useCourseImage.ts";
 import { getHolePar, hasParData } from "../../utils/parUtils.ts";
+import ShareModal from "./ShareModal.tsx";
 
 const ScorecardPage = () => {
     const { courseId, gameId } = useParams();
-    const { data: game, isLoading: gameLoading } = useGame(String(gameId));
+    const { data: game, isLoading: gameLoading } = useGameLive(String(gameId));
     const { data: course, isLoading: courseLoading } = useCourse(String(courseId));
     const { mutate: updateGame } = useUpdateGame();
     const navigate = useNavigate();
@@ -21,7 +22,10 @@ const ScorecardPage = () => {
     const [activeTab, setActiveTab] = useState<"score" | "oversigt">("score");
     const [currentHole, setCurrentHole] = useState<number>(0);
     const [localPlayers, setLocalPlayers] = useState<Player[] | null>(null);
+    const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [shareModalOpen, setShareModalOpen] = useState(false);
     const [allowNavigation, setAllowNavigation] = useState(false);
+    const gameUrl = `${window.location.origin}/${courseId}/game/${gameId}`;
 
     // Block in-app navigation (browser back, swipe-back) with confirmation
     const blocker = useBlocker(!allowNavigation);
@@ -58,7 +62,16 @@ const ScorecardPage = () => {
 
     const saveToServer = (players: Player[]) => {
         if (!game) return;
+        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
         updateGame({ ...game, players });
+    };
+
+    const debouncedSave = (players: Player[]) => {
+        if (!game) return;
+        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = setTimeout(() => {
+            updateGame({ ...game, players });
+        }, 800);
     };
 
     if (gameLoading || courseLoading) return <p className="text-center mt-20 animate-pulse">Henter spil...</p>;
@@ -68,7 +81,7 @@ const ScorecardPage = () => {
     const workingGame: Game = { ...game, players: currentPlayers };
 
     const handleScoreChange = (playerIndex: number, value: number | null) => {
-        const updatedPlayers: Player[] = currentPlayers.map((player, i) => {
+        const updatedPlayers: Player[] = currentPlayers.map((player: Player, i: number) => {
             if (i !== playerIndex) return player;
             const updatedScores = [...player.scores];
             updatedScores[currentHole] = value;
@@ -76,6 +89,7 @@ const ScorecardPage = () => {
         });
 
         setLocalPlayers(updatedPlayers);
+        debouncedSave(updatedPlayers);
     };
 
     const handleHoleChange = (newHole: number) => {
@@ -133,10 +147,12 @@ const ScorecardPage = () => {
             {/* Header */}
             <div className="bg-linear-to-r from-green-600 to-green-800 text-white px-5 py-4 flex justify-between items-center">
                 <div className="flex flex-col gap-1">
-                    <h1 className="text-lg font-bold">{game.name}</h1>
+                    <h1 onClick={() => setShareModalOpen(true)} className="text-lg font-bold">Tilslut kamp</h1>
+                    <ShareModal open={shareModalOpen} onClose={() => setShareModalOpen(false)} gameUrl={gameUrl} />
                 </div>
 
-                <span onClick={() => {
+                <span className="text-gray-300"
+                    onClick={() => {
                     const newRound = confirm("Er du sikker på at du vil afslutte runden? Du vil blive ført tilbage spiloprettelse.");
                     if (newRound) {
                         setAllowNavigation(true);

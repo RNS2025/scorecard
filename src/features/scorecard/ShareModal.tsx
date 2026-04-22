@@ -10,10 +10,10 @@ interface ShareModalProps {
 
 const ShareModal = ({ open, onClose, gameUrl }: ShareModalProps) => {
     return (
-        <Modal open={open} onClose={onClose} center>
+        <Modal open={open} onClose={onClose} center showCloseIcon={false}>
             <div className="flex flex-col items-center gap-4 px-2 pb-2">
                 <div className="text-center">
-                    <h2 className="text-lg font-bold text-gray-800">Del kamp</h2>
+                    <h2 className="text-lg font-bold text-gray-800">Tilslut kamp</h2>
                     <p className="text-sm text-gray-500 mt-1">Scan QR-koden for at tilslutte kampen</p>
                 </div>
 
