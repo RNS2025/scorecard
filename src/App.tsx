@@ -1,5 +1,4 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom"
-import SelectCoursesPage from "./features/SelectCoursesPage.tsx";
 import HomePage from "./features/HomePage.tsx";
 import CreateGamePage from "./features/createGame/CreateGamePage.tsx";
 import ScorecardPage from "./features/scorecard/ScorecardPage.tsx";
@@ -11,10 +10,11 @@ import LoginPage from "./features/admin/LoginPage.tsx";
 import DashboardPage from "./features/admin/dashboard/DashboardPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import NotFoundPage from "./features/NotFoundPage.tsx";
+import SelectCoursesPage from "./features/SelectCoursesPage.tsx";
 
 const router = createBrowserRouter([
     { path: "/", element: <HomePage /> },
-    { path: "/courses", element: <SelectCoursesPage /> },
+    { path: "/course", element: <SelectCoursesPage /> },
     { path: "/:courseId/creategame", element: <CreateGamePage /> },
     { path: "/:courseId/game/:gameId", element: <ScorecardPage /> },
     { path: "/:courseId/game/:gameId/score-only", element: <SharedScorePage /> },
