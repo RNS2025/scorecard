@@ -1,7 +1,7 @@
 import {useNavigate, useParams, useBlocker} from "react-router-dom";
 import { useGameLive, useUpdateGame } from "../../hooks/useGame.ts";
 import { useCourse } from "../../hooks/useCourses.ts";
-import {useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import type { Player } from "../../utils/interfaces/Game.ts";
 import type { Game } from "../../utils/interfaces/Game.ts";
 import ScoreTab from "./ScoreTab.tsx";
@@ -23,12 +23,18 @@ const ScorecardPage = () => {
     const [currentHole, setCurrentHole] = useState<number>(0);
     const [localPlayers, setLocalPlayers] = useState<Player[] | null>(null);
     const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    // Ref i stedet for state – sætter synkront så blokkeren aldrig opfanger planlagt navigation
+    const allowNavigationRef = useRef(false);
     const [shareModalOpen, setShareModalOpen] = useState(false);
-    const [allowNavigation, setAllowNavigation] = useState(false);
     const gameUrl = `${window.location.origin}/${courseId}/game/${gameId}`;
 
+    const navigateAway = useCallback((path: string) => {
+        allowNavigationRef.current = true;
+        navigate(path);
+    }, [navigate]);
+
     // Block in-app navigation (browser back, swipe-back) with confirmation
-    const blocker = useBlocker(!allowNavigation);
+    const blocker = useBlocker(() => !allowNavigationRef.current);
 
     useEffect(() => {
         if (blocker.state === "blocked") {
@@ -43,22 +49,15 @@ const ScorecardPage = () => {
         }
     }, [blocker, blocker.state]);
 
-    // Also block full page unload (refresh, close tab, navigate away from site)
+    // Block full page unload (refresh, close tab)
     useEffect(() => {
-        if (allowNavigation) return;
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (allowNavigationRef.current) return;
             e.preventDefault();
         };
         window.addEventListener("beforeunload", handleBeforeUnload);
         return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-    }, [allowNavigation]);
-
-    // Navigate away once allowNavigation is set (after confirming "Afslut runde")
-    useEffect(() => {
-        if (allowNavigation) {
-            navigate(`/${courseId}/creategame`);
-        }
-    }, [allowNavigation, navigate, courseId]);
+    }, []);
 
     const saveToServer = (players: Player[]) => {
         if (!game) return;
@@ -155,7 +154,7 @@ const ScorecardPage = () => {
                     onClick={() => {
                     const newRound = confirm("Er du sikker på at du vil afslutte runden? Du vil blive ført tilbage spiloprettelse.");
                     if (newRound) {
-                        setAllowNavigation(true);
+                        navigateAway(`/${courseId}/creategame`);
                     }
                 }}>Afslut runde</span>
             </div>
@@ -203,7 +202,7 @@ const ScorecardPage = () => {
                     getPlayerTotalDiff={getPlayerTotalDiff}
                     getPlayerDiffForHole={getPlayerDiffForHole}
                     getDiffColor={getDiffColor}
-                    setAllowNavigation={setAllowNavigation}
+                    navigateAway={navigateAway}
                 />
             )}
 

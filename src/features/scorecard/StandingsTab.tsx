@@ -2,7 +2,6 @@ import type { Game } from "../../utils/interfaces/Game.ts";
 import type { Course } from "../../utils/interfaces/Course.ts";
 import type { Player } from "../../utils/interfaces/Game.ts";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { usePublishScores } from "../../hooks/useLeaderboard.ts";
 import type { LeaderboardEntry } from "../../utils/interfaces/Leaderboard.ts";
 import { getHolePar, getTotalPar, getShotLabel } from "../../utils/parUtils.ts";
@@ -20,11 +19,10 @@ interface OverviewTabProps {
     getPlayerTotalDiff: (player: Player) => string;
     getPlayerDiffForHole: (score: number | null, par: number | undefined) => string | null;
     getDiffColor: (diff: string | null) => string;
-    setAllowNavigation: (value: boolean) => void;
+    navigateAway: (path: string) => void;
 }
 
-const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPlayerDiffForHole, getDiffColor, setAllowNavigation }: OverviewTabProps) => {
-    const navigate = useNavigate();
+const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPlayerDiffForHole, getDiffColor, navigateAway }: OverviewTabProps) => {
     const { mutate: publishScores, isPending: isPublishing } = usePublishScores();
     const [publishPlayers, setPublishPlayers] = useState<boolean[]>(game.players.map(() => false));
     const [step, setStep] = useState<"standings" | "publish">("standings");
@@ -93,8 +91,7 @@ const StandingsTab = ({ game, course, getPlayerTotal, getPlayerTotalDiff, getPla
 
         publishScores(entries, {
             onSuccess: () => {
-                setAllowNavigation(true);
-                navigate(`/${course.id}/leaderboard`);
+                navigateAway(`/${course.id}/leaderboard`);
             },
             onError: (e) => {
                 alert("Noget gik galt – prøv igen.")
