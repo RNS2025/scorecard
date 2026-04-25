@@ -12,7 +12,7 @@ const RulesList = ({ rules }: RulesListProps) => {
     }
 
     return (
-        <div className="h-full bg-white/5 rounded-xl flex flex-col gap-5 py-2 overflow-y-auto pr-2">
+        <div className={`h-full bg-white/5 rounded-xl grid grid-rows-${rules.length} gap-5 py-2 overflow-y-auto pr-2`}>
             {rules.map((rule, i) => (
                 <div
                     key={i}
@@ -21,7 +21,7 @@ const RulesList = ({ rules }: RulesListProps) => {
                     <span className="shrink-0 w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-sm font-bold">
                         {i + 1}
                     </span>
-                    <p className="text-white/80 leading-relaxed">{rule}</p>
+                    <p className="text-white/80 leading-relaxed text-lg">{rule}</p>
                 </div>
             ))}
         </div>

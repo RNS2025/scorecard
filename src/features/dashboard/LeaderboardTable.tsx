@@ -1,6 +1,8 @@
 import { TrophyIcon } from "@heroicons/react/24/solid";
 import type { LeaderboardEntry } from "../../utils/interfaces/Leaderboard.ts";
 import { getShotHeader } from "../../utils/parUtils.ts";
+import {format} from "date-fns";
+import {da} from "date-fns/locale";
 
 interface LeaderboardTableProps {
     entries?: LeaderboardEntry[];
@@ -46,8 +48,11 @@ const LeaderboardTable = ({ entries, getDiffLabel, getDiffColor, getMedalColor, 
                                     {i + 1}
                                 </span>
                             </td>
-                            <td className="px-4 font-semibold">{entry.playerName}</td>
-                            <td className="px-4 text-center text-white">{entry.totalShots}</td>
+                            <td className="px-4">
+                                <p className="font-semibold">{entry.playerName}</p>
+                                <p className="text-sm text-gray-500">{entry.createdAt ? format(new Date(entry.createdAt), "dd. MMMM | HH:mm", {locale: da}) : "—"}</p>
+                            </td>
+                            <td className="px-4 text-center font-semibold">{entry.totalShots}</td>
                             {parMode !== "calculated" && (
                             <td className={`px-4 text-center font-bold ${getDiffColor(entry.totalDiff)}`}>
                                 {getDiffLabel(entry.totalDiff)}
