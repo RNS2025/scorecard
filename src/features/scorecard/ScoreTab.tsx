@@ -99,7 +99,7 @@ const ScoreTab = ({ game, course, currentHole, setCurrentHole, onScoreChange, ge
             </div>
 
             {/* Score-input per spiller */}
-            <div className="flex flex-col gap-4 max-h-[calc(100vh-25rem)] overflow-y-auto">
+            <div className="flex flex-col gap-4 h-[calc(100vh-28rem)] overflow-y-auto pb-3">
                 {game.players.map((player, playerIndex) => {
                     const score = player.scores[currentHole];
                     return (
