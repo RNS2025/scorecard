@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Helmet } from "react-helmet-async";
 import scorecard_logo from "../assets/scorecard logo.png";
 import rns_logo from "../assets/rns_green.png";
 import { ref, listAll, getDownloadURL } from "firebase/storage";
@@ -272,6 +273,16 @@ const HomePage = () => {
 
     return (
         <div className="min-h-screen bg-white text-gray-800 font-sans">
+
+            <Helmet>
+                <title>Scorecard – Digitalt scorekort til minigolf, fodboldgolf mm.</title>
+                <meta name="description" content="Giv dine gæster et moderne, mobilvenligt scorekort uden app-download. Scores samles automatisk i en rangliste. Prøv Scorecard på din bane." />
+                <meta name="keywords" content="digitalt scorekort, minigolf, fodboldgolf, scorekort app, rangliste, QR scorekort" />
+                <meta property="og:title" content="Scorecard – Digitalt scorekort til din bane" />
+                <meta property="og:description" content="Moderne scorekort til minigolf, fodboldgolf mm. Ingen app-download. Automatisk rangliste." />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://scorecard.dk" />
+            </Helmet>
 
             {/* NAV */}
             <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100 px-6 py-3 flex items-center justify-between">
