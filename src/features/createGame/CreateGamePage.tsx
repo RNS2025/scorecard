@@ -52,8 +52,6 @@ const CreateGamePage = () => {
     const newPlayerInputRef = useRef<HTMLInputElement>(null);
 
 
-    const playerCount = playerNames.length;
-
     const handleAddPlayer = (name: string, email?: string) => {
         const trimmed = name.trim();
         if (!trimmed) return;
@@ -81,13 +79,19 @@ const CreateGamePage = () => {
     };
 
     const handleCreateGame = () => {
-        if (!course || !courseId || playerNames.length === 0) return;
-        if (playerNames.some((name) => !name.trim())) return;
+        if (!course || !courseId) return;
+
+        // Auto-tilføj spiller hvis der er tekst i inputfeltet
+        const pendingName = newPlayerName.trim();
+        const finalPlayerNames = pendingName ? [...playerNames, pendingName] : playerNames;
+        const finalPlayerEmails = pendingName ? [...playerEmails, undefined] : playerEmails;
+
+        if (finalPlayerNames.length === 0) return;
+        if (finalPlayerNames.some((name) => !name.trim())) return;
 
         const defaultName = formatDate(new Date(), "dd/MM/yyyy", { locale: da });
 
-        // Bland rækkefølgen
-        const combined = playerNames.map((name, i) => ({ name, email: playerEmails[i] }));
+        const combined = finalPlayerNames.map((name, i) => ({ name, email: finalPlayerEmails[i] }));
         for (let i = combined.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [combined[i], combined[j]] = [combined[j], combined[i]];
@@ -97,7 +101,7 @@ const CreateGamePage = () => {
             courseId: courseId,
             name: gameName.trim() || defaultName,
             format: format as "slagspil" | "hulspil",
-            numberOfPlayers: playerCount,
+            numberOfPlayers: finalPlayerNames.length,
             players: combined.map((p) => ({
                 name: p.name.trim(),
                 email: p.email,
@@ -399,7 +403,8 @@ const CreateGamePage = () => {
                     <div className="flex flex-col gap-2">
                         <h1 className="text-center text-sm italic text-gray-500">Antal spillere: {playerNames.length} spillere</h1>
 
-                        {playerNames.length > 0 && playerNames.every((name) => name.trim()) && (
+                        {(playerNames.length > 0 || newPlayerName.trim()) &&
+                         [...playerNames, newPlayerName.trim()].filter(Boolean).every((name) => name.trim()) && (
                             <button
                                 onClick={() => handleCreateGame()}
                                 className="w-full bg-linear-to-r from-green-500 to-green-800 text-white font-bold
